@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/components/FFmpegPanel/templates/default.json",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1748082930968,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1748086993443,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,12 +0,0 @@\n-{\r\n-  \"id\": \"default\",\r\n-  \"name\": \"常用高清压缩\",\r\n-  \"operations\": [\"scale\", \"compress\"],\r\n-  \"params\": {\r\n-    \"width\": 1280,\r\n-    \"height\": 720,\r\n-    \"bitrate\": 1200\r\n-  },\r\n-  \"createdAt\": 0,\r\n-  \"updatedAt\": 0\r\n-}\r\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1748082930968,
+            "name": "Commit-0",
+            "content": "{\r\n  \"id\": \"default\",\r\n  \"name\": \"常用高清压缩\",\r\n  \"operations\": [\"scale\", \"compress\"],\r\n  \"params\": {\r\n    \"width\": 1280,\r\n    \"height\": 720,\r\n    \"bitrate\": 1200\r\n  },\r\n  \"createdAt\": 0,\r\n  \"updatedAt\": 0\r\n}\r\n"
+        }
+    ]
+}

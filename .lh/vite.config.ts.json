@@ -1,0 +1,18 @@
+{
+    "sourceFile": "vite.config.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1748066283714,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1748066283714,
+            "name": "Commit-0",
+            "content": "import { defineConfig } from \"vite\";\nimport path from \"path\";\nimport react from \"@vitejs/plugin-react-swc\";\nimport viteCompression from \"vite-plugin-compression\";\n\n// https://vitejs.dev/config/\nexport default defineConfig({\n  plugins: [react(), viteCompression()],\n  // 别名、后缀\n  resolve: {\n    alias: {\n      \"@\": path.resolve(__dirname, \"./src\"),\n    },\n    extensions: [\".js\", \".ts\", \".jsx\", \".tsx\"],\n  },\n  css: {\n    modules: {\n      localsConvention: \"camelCase\",\n      generateScopedName: \"[local]_[hash:base64:5]\",\n    },\n    preprocessorOptions: {\n      less: {\n        javascriptEnabled: true,\n      },\n    },\n  },\n  define: {\n    \"process.env\": process.env,\n  },\n  build: {\n    sourcemap: process.env.NODE_ENV !== \"production\",\n    outDir: \"dist\",\n    assetsDir: \"assets\",\n    target: \"esnext\",\n    rollupOptions: {\n      output: {\n        manualChunks: {\n          react: [\"react\", \"react-dom\", \"react-router-dom\"],\n          antd: [\"antd\", \"@ant-design/icons\"],\n          axios: [\"axios\", \"axios-auth-refresh\"],\n          immer: [\"immer\"],\n          zustand: [\"zustand\"],\n          lodash: [\"lodash\"],\n          dayjs: [\"dayjs\"],\n          localforage: [\"localforage\"],\n          tanstack: [\"@tanstack/react-query\", \"@tanstack/react-query-devtools\"],\n          keepalive: [\"keepalive-for-react\"],\n        },\n      },\n    },\n  },\n  optimizeDeps: {\n    include: [\"lodash\"],\n  },\n});\n"
+        }
+    ]
+}

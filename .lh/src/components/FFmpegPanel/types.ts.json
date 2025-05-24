@@ -1,0 +1,30 @@
+{
+    "sourceFile": "src/components/FFmpegPanel/types.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 3,
+            "patches": [
+                {
+                    "date": 1748082914359,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1748086583350,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -20,9 +20,10 @@\n   min?: number;\r\n   max?: number;\r\n   step?: number;\r\n   placeholder?: string;\r\n-  options?: { label: string; value: string }[];\r\n+  options?: { label: string; value: string | number }[];\r\n+  defaultValue?: any;\r\n }\r\n \r\n export interface FFmpegOperationSchema {\r\n   label: string;\r\n"
+                },
+                {
+                    "date": 1748086590460,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -21,9 +21,9 @@\n   max?: number;\r\n   step?: number;\r\n   placeholder?: string;\r\n   options?: { label: string; value: string | number }[];\r\n-  defaultValue?: any;\r\n+  defaultValue?: number | string | boolean;\r\n }\r\n \r\n export interface FFmpegOperationSchema {\r\n   label: string;\r\n"
+                },
+                {
+                    "date": 1748086993442,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,45 +0,0 @@\n-// FFmpeg 操作类型、参数、模板等类型定义\r\n-\r\n-export type FFmpegOperationType =\r\n-  | \"scale\"\r\n-  | \"compress\"\r\n-  | \"extract-audio\"\r\n-  | \"crop\"\r\n-  | \"clip-segment\"\r\n-  | \"watermark\"\r\n-  | \"convert\"\r\n-  | \"framerate\"\r\n-  | \"volume\"\r\n-  | \"gif\"\r\n-  | \"cover\";\r\n-\r\n-export interface FFmpegParamSchema {\r\n-  name: string;\r\n-  label: string;\r\n-  type: \"number\" | \"select\" | \"text\" | \"switch\";\r\n-  min?: number;\r\n-  max?: number;\r\n-  step?: number;\r\n-  placeholder?: string;\r\n-  options?: { label: string; value: string | number }[];\r\n-  defaultValue?: number | string | boolean;\r\n-}\r\n-\r\n-export interface FFmpegOperationSchema {\r\n-  label: string;\r\n-  params: FFmpegParamSchema[];\r\n-}\r\n-\r\n-export type FFmpegSchemaMap = Record<\r\n-  FFmpegOperationType,\r\n-  FFmpegOperationSchema\r\n->;\r\n-\r\n-export interface FFmpegTemplate {\r\n-  id: string;\r\n-  name: string;\r\n-  operations: FFmpegOperationType[];\r\n-  params: Record<string, any>; // 各参数值\r\n-  createdAt: number;\r\n-  updatedAt: number;\r\n-}\r\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1748082914359,
+            "name": "Commit-0",
+            "content": "// FFmpeg 操作类型、参数、模板等类型定义\r\n\r\nexport type FFmpegOperationType =\r\n  | \"scale\"\r\n  | \"compress\"\r\n  | \"extract-audio\"\r\n  | \"crop\"\r\n  | \"clip-segment\"\r\n  | \"watermark\"\r\n  | \"convert\"\r\n  | \"framerate\"\r\n  | \"volume\"\r\n  | \"gif\"\r\n  | \"cover\";\r\n\r\nexport interface FFmpegParamSchema {\r\n  name: string;\r\n  label: string;\r\n  type: \"number\" | \"select\" | \"text\" | \"switch\";\r\n  min?: number;\r\n  max?: number;\r\n  step?: number;\r\n  placeholder?: string;\r\n  options?: { label: string; value: string }[];\r\n}\r\n\r\nexport interface FFmpegOperationSchema {\r\n  label: string;\r\n  params: FFmpegParamSchema[];\r\n}\r\n\r\nexport type FFmpegSchemaMap = Record<\r\n  FFmpegOperationType,\r\n  FFmpegOperationSchema\r\n>;\r\n\r\nexport interface FFmpegTemplate {\r\n  id: string;\r\n  name: string;\r\n  operations: FFmpegOperationType[];\r\n  params: Record<string, any>; // 各参数值\r\n  createdAt: number;\r\n  updatedAt: number;\r\n}\r\n"
+        }
+    ]
+}

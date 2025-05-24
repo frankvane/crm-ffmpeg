@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/components/FFmpegPanel/api.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1748082925504,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1748086993439,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,16 +0,0 @@\n-// FFmpegPanel 相关API方法（预留，后续实现）\r\n-\r\n-import { FFmpegTemplate } from \"./types\";\r\n-\r\n-export async function fetchTemplatesFromServer(): Promise<FFmpegTemplate[]> {\r\n-  // TODO: 调用后端接口获取模板列表\r\n-  return [];\r\n-}\r\n-\r\n-export async function saveTemplateToServer(tpl: FFmpegTemplate): Promise<void> {\r\n-  // TODO: 调用后端接口保存模板\r\n-}\r\n-\r\n-export async function submitFFmpegTask(params: any): Promise<any> {\r\n-  // TODO: 提交处理任务\r\n-}\r\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1748082925504,
+            "name": "Commit-0",
+            "content": "// FFmpegPanel 相关API方法（预留，后续实现）\r\n\r\nimport { FFmpegTemplate } from \"./types\";\r\n\r\nexport async function fetchTemplatesFromServer(): Promise<FFmpegTemplate[]> {\r\n  // TODO: 调用后端接口获取模板列表\r\n  return [];\r\n}\r\n\r\nexport async function saveTemplateToServer(tpl: FFmpegTemplate): Promise<void> {\r\n  // TODO: 调用后端接口保存模板\r\n}\r\n\r\nexport async function submitFFmpegTask(params: any): Promise<any> {\r\n  // TODO: 提交处理任务\r\n}\r\n"
+        }
+    ]
+}
