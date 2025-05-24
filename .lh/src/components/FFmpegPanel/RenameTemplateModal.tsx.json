@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/components/FFmpegPanel/RenameTemplateModal.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1748090393176,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1748090393176,
+            "name": "Commit-0",
+            "content": "import { Button, Input, Modal } from 'antd';\r\n\r\nimport React from 'react';\r\n\r\ninterface RenameTemplateModalProps {\r\n  renameModalOpen: boolean;\r\n  handleRenameCancel: () => void;\r\n  handleRenameSave: () => void;\r\n  renamingTemplate: { id: string; name: string } | null;\r\n  newTemplateName: string;\r\n  setNewTemplateName: (name: string) => void;\r\n}\r\n\r\nconst RenameTemplateModal: React.FC<RenameTemplateModalProps> = ({\r\n  renameModalOpen,\r\n  handleRenameCancel,\r\n  handleRenameSave,\r\n  renamingTemplate,\r\n  newTemplateName,\r\n  setNewTemplateName,\r\n}) => {\r\n  return (\r\n    <Modal\r\n      title={`重命名模板：${renamingTemplate?.name || \"\"}`}\r\n      open={renameModalOpen}\r\n      onCancel={handleRenameCancel}\r\n      footer={[\r\n        <Button key=\"back\" onClick={handleRenameCancel}>\r\n          取消\r\n        </Button>,\r\n        <Button key=\"submit\" type=\"primary\" onClick={handleRenameSave}>\r\n          保存\r\n        </Button>,\r\n      ]}\r\n    >\r\n      <Input\r\n        placeholder=\"请输入新的模板名称\"\r\n        value={newTemplateName}\r\n        onChange={(e) => setNewTemplateName(e.target.value)}\r\n        onPressEnter={handleRenameSave}\r\n      />\r\n    </Modal>\r\n  );\r\n};\r\n\r\nexport default RenameTemplateModal;"
+        }
+    ]
+}

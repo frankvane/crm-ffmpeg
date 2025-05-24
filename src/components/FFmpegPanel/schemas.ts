@@ -118,7 +118,7 @@ export const OPERATION_SCHEMAS: FFmpegSchemaMap = {
         label: "水印文字",
         type: "text",
         placeholder: "如 MyWatermark",
-        defaultValue: "",
+        defaultValue: "watermark",
       },
       {
         name: "fontSize",

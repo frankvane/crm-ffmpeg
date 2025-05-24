@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 3,
+            "activePatchIndex": 4,
             "patches": [
                 {
                     "date": 1748082918124,
@@ -20,6 +20,10 @@
                 {
                     "date": 1748086694429,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -117,9 +117,9 @@\n         name: \"watermarkText\",\r\n         label: \"水印文字\",\r\n         type: \"text\",\r\n         placeholder: \"如 MyWatermark\",\r\n-        defaultValue: \"watermark\",\r\n+        defaultValue: \"\",\r\n       },\r\n       {\r\n         name: \"fontSize\",\r\n         label: \"字体大小\",\r\n"
+                },
+                {
+                    "date": 1748087454914,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -117,9 +117,9 @@\n         name: \"watermarkText\",\r\n         label: \"水印文字\",\r\n         type: \"text\",\r\n         placeholder: \"如 MyWatermark\",\r\n-        defaultValue: \"\",\r\n+        defaultValue: \"watermark\",\r\n       },\r\n       {\r\n         name: \"fontSize\",\r\n         label: \"字体大小\",\r\n"
                 }
             ],
             "date": 1748082918124,

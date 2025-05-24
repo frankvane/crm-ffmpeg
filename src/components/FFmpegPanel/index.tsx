@@ -1,361 +1,270 @@
 import "./style.less";
 
-import {
-  Alert,
-  Button,
-  Card,
-  Divider,
-  Form,
-  Input,
-  InputNumber,
-  Progress,
-  Select,
-  Switch,
-} from "antd";
-import React, { useState } from "react";
+import { Alert, Button, Card, Checkbox, Col, Divider, Form, Row } from "antd";
+import { FFmpegOperationType, ParamValues } from "./types";
+import React, { useEffect } from "react";
 
-// 类型定义
-interface ParamSchema {
-  name: string;
-  label: string;
-  type: string;
-  min?: number;
-  max?: number;
-  step?: number;
-  placeholder?: string;
-  options?: { label: string; value: string }[];
-}
-interface OperationSchema {
-  label: string;
-  params: ParamSchema[];
-}
-
-// 操作类型与参数schema定义
-const OPERATION_SCHEMAS: Record<string, OperationSchema> = {
-  scale: {
-    label: "视频缩放",
-    params: [
-      {
-        name: "width",
-        label: "目标宽度",
-        type: "number",
-        min: 1,
-        placeholder: "如 1280",
-      },
-      {
-        name: "height",
-        label: "目标高度",
-        type: "number",
-        min: 1,
-        placeholder: "如 720",
-      },
-    ],
-  },
-  compress: {
-    label: "视频压缩",
-    params: [
-      {
-        name: "bitrate",
-        label: "目标码率(kbps)",
-        type: "number",
-        min: 100,
-        placeholder: "如 800",
-      },
-    ],
-  },
-  "extract-audio": {
-    label: "转出音频",
-    params: [
-      {
-        name: "audioFormat",
-        label: "音频格式",
-        type: "select",
-        options: [
-          { label: "MP3", value: "mp3" },
-          { label: "AAC", value: "aac" },
-          { label: "WAV", value: "wav" },
-        ],
-        placeholder: "选择格式",
-      },
-    ],
-  },
-  crop: {
-    label: "裁剪",
-    params: [
-      {
-        name: "x",
-        label: "起始X",
-        type: "number",
-        min: 0,
-        placeholder: "如 0",
-      },
-      {
-        name: "y",
-        label: "起始Y",
-        type: "number",
-        min: 0,
-        placeholder: "如 0",
-      },
-      {
-        name: "width",
-        label: "宽度",
-        type: "number",
-        min: 1,
-        placeholder: "如 640",
-      },
-      {
-        name: "height",
-        label: "高度",
-        type: "number",
-        min: 1,
-        placeholder: "如 360",
-      },
-    ],
-  },
-  "clip-segment": {
-    label: "截取片段",
-    params: [
-      {
-        name: "start",
-        label: "起始时间(秒)",
-        type: "number",
-        min: 0,
-        placeholder: "如 10",
-      },
-      {
-        name: "duration",
-        label: "持续时长(秒)",
-        type: "number",
-        min: 1,
-        placeholder: "如 30",
-      },
-    ],
-  },
-  watermark: {
-    label: "加水印",
-    params: [
-      {
-        name: "watermarkText",
-        label: "水印文字",
-        type: "text",
-        placeholder: "如 MyWatermark",
-      },
-      {
-        name: "fontSize",
-        label: "字体大小",
-        type: "number",
-        min: 10,
-        placeholder: "如 24",
-      },
-      {
-        name: "opacity",
-        label: "透明度(0-1)",
-        type: "number",
-        min: 0,
-        max: 1,
-        step: 0.1,
-        placeholder: "如 0.5",
-      },
-    ],
-  },
-  convert: {
-    label: "格式转换",
-    params: [
-      {
-        name: "format",
-        label: "目标格式",
-        type: "select",
-        options: [
-          { label: "MP4", value: "mp4" },
-          { label: "AVI", value: "avi" },
-          { label: "MOV", value: "mov" },
-          { label: "MKV", value: "mkv" },
-          { label: "FLV", value: "flv" },
-        ],
-        placeholder: "选择格式",
-      },
-    ],
-  },
-  framerate: {
-    label: "帧率调整",
-    params: [
-      {
-        name: "fps",
-        label: "目标帧率",
-        type: "number",
-        min: 1,
-        max: 120,
-        placeholder: "如 30",
-      },
-    ],
-  },
-  volume: {
-    label: "音量调整",
-    params: [
-      {
-        name: "volume",
-        label: "音量倍数",
-        type: "number",
-        min: 0,
-        max: 10,
-        step: 0.1,
-        placeholder: "如 1.5",
-      },
-    ],
-  },
-  gif: {
-    label: "视频转GIF",
-    params: [
-      {
-        name: "start",
-        label: "起始时间(秒)",
-        type: "number",
-        min: 0,
-        placeholder: "如 0",
-      },
-      {
-        name: "duration",
-        label: "持续时长(秒)",
-        type: "number",
-        min: 1,
-        placeholder: "如 5",
-      },
-    ],
-  },
-  cover: {
-    label: "提取封面",
-    params: [
-      {
-        name: "time",
-        label: "时间点(秒)",
-        type: "number",
-        min: 0,
-        placeholder: "如 1",
-      },
-    ],
-  },
-};
-
-const OPERATION_OPTIONS = Object.entries(OPERATION_SCHEMAS).map(
-  ([value, { label }]) => ({ label, value })
-);
+import { OPERATION_SCHEMAS } from "./schemas";
+import OperationParametersFormItems from "./OperationParametersFormItems";
+import RenameTemplateModal from "./RenameTemplateModal";
+import TemplateManagementModal from "./TemplateManagementModal";
+import { getParamNameConflicts } from "./utils";
+import { useFFmpegPanelStore } from "./store";
+import useTemplateManagement from "./hooks/useTemplateManagement";
 
 const FFmpegPanel: React.FC = () => {
-  const [operation, setOperation] =
-    useState<keyof typeof OPERATION_SCHEMAS>("scale");
-  const [processing, setProcessing] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [result, setResult] = useState<string | null>(null);
   const [form] = Form.useForm();
+  const {
+    selectedOperations,
+    paramValues,
+    setSelectedOperations,
+    setParamValues,
+  } = useFFmpegPanelStore();
 
-  // 根据schema渲染参数表单
-  const renderParams = () => {
-    const params = OPERATION_SCHEMAS[operation]?.params || [];
-    return params.map((param: ParamSchema) => {
-      switch (param.type) {
-        case "number":
-          return (
-            <Form.Item key={param.name} label={param.label} name={param.name}>
-              <InputNumber
-                min={param.min}
-                max={param.max}
-                step={param.step || 1}
-                placeholder={param.placeholder}
-                style={{ width: "100%" }}
-              />
-            </Form.Item>
-          );
-        case "select":
-          return (
-            <Form.Item key={param.name} label={param.label} name={param.name}>
-              <Select placeholder={param.placeholder} options={param.options} />
-            </Form.Item>
-          );
-        case "text":
-          return (
-            <Form.Item key={param.name} label={param.label} name={param.name}>
-              <Input placeholder={param.placeholder} />
-            </Form.Item>
-          );
-        case "switch":
-          return (
-            <Form.Item
-              key={param.name}
-              label={param.label}
-              name={param.name}
-              valuePropName="checked"
-            >
-              <Switch />
-            </Form.Item>
-          );
-        default:
-          return null;
+  // 使用抽离的模板管理hook
+  const {
+    modalOpen,
+    setModalOpen,
+    editingTemplateId,
+    newTplName,
+    setNewTplName,
+    renameModalOpen,
+    renamingTemplate,
+    newTemplateName,
+    setNewTemplateName,
+    templates,
+    handleCreateTemplate,
+    handleUpdateTemplate,
+    handleSaveTemplate,
+    handleOpenRenameModal,
+    handleRenameCancel,
+    handleRenameSave,
+    deleteTemplate,
+    applyTemplate,
+  } = useTemplateManagement({ form, selectedOperations, paramValues });
+
+  // 定义操作类型分组和对应的Antd Checkbox options
+  const videoProcessOps: FFmpegOperationType[] = [
+    "scale",
+    "compress",
+    "crop",
+    "clip-segment",
+    "watermark",
+    "framerate",
+    "gif",
+    "cover",
+  ];
+  const formatConvertOp: FFmpegOperationType = "convert";
+  const audioOps: FFmpegOperationType[] = ["extract-audio", "volume"];
+
+  const videoProcessOptions = videoProcessOps.map((op) => ({
+    label: OPERATION_SCHEMAS[op].label,
+    value: op,
+  }));
+  const formatConvertOption = {
+    label: OPERATION_SCHEMAS[formatConvertOp].label,
+    value: formatConvertOp,
+  };
+  const audioOptions = audioOps.map((op) => ({
+    label: OPERATION_SCHEMAS[op].label,
+    value: op,
+  }));
+
+  // 视觉顺序：视频处理、格式转换、音频
+  const getVisualSelectedOperations = () => {
+    const video = videoProcessOps.filter((v) => selectedOperations.includes(v));
+    const format = selectedOperations.includes(formatConvertOp)
+      ? [formatConvertOp]
+      : [];
+    const audio = audioOps.filter((a) => selectedOperations.includes(a));
+    return [...video, ...format, ...audio];
+  };
+
+  // 处理操作类型多选 (包含互斥和参数名冲突检测)
+  const handleOperationChange = (ops: Array<FFmpegOperationType>) => {
+    let newOps = [...ops];
+
+    // 格式转换互斥逻辑
+    if (newOps.includes(formatConvertOp)) {
+      newOps = [formatConvertOp, ...audioOps.filter((a) => newOps.includes(a))];
+    } else {
+      newOps = [
+        ...videoProcessOps.filter((v) => newOps.includes(v)),
+        ...audioOps.filter((a) => newOps.includes(a)),
+      ];
+    }
+
+    // 参数名冲突检测 (保留)
+    const conflicts = getParamNameConflicts(newOps);
+    if (conflicts.length > 0) {
+      // 这里只显示冲突信息，但不阻止选择，让用户自行决定
+      console.warn("参数名冲突:", conflicts);
+    }
+
+    setSelectedOperations(newOps);
+
+    // **新增逻辑：根据新的选中操作和当前值，计算并应用默认值**
+    const updatedParamValues: ParamValues = { ...paramValues }; // 保留现有参数值
+    newOps.forEach((op) => {
+      if (!updatedParamValues[op]) {
+        updatedParamValues[op] = {}; // 如果新操作没有对应的参数对象，则创建一个
       }
+      const params = OPERATION_SCHEMAS[op]?.params || [];
+      params.forEach((param) => {
+        // 如果参数在当前paramValues中没有值，且schema中有默认值，则设置默认值
+        if (
+          updatedParamValues[op][param.name] === undefined &&
+          param.defaultValue !== undefined
+        ) {
+          updatedParamValues[op][param.name] = param.defaultValue;
+        }
+      });
     });
+
+    setParamValues(updatedParamValues);
+    form.setFieldsValue(updatedParamValues); // 同步到表单
   };
 
-  // 模拟处理进度
-  const handleProcess = () => {
-    setProcessing(true);
-    setProgress(0);
-    setResult(null);
-    let percent = 0;
-    const timer = setInterval(() => {
-      percent += Math.random() * 20;
-      if (percent >= 100) {
-        percent = 100;
-        clearInterval(timer);
-        setProcessing(false);
-        setResult("处理完成，结果文件下载链接/预览（占位）");
-      }
-      setProgress(percent);
-    }, 500);
+  // 处理参数表单变更
+  const handleValuesChange = (_changed: ParamValues, all: ParamValues) => {
+    setParamValues(all);
   };
+
+  // 表单初始值同步和默认值设置
+  useEffect(() => {
+    // 组件加载时，如果paramValues为空，根据初始选中的操作设置默认值
+    if (
+      Object.keys(paramValues).length === 0 &&
+      selectedOperations.length > 0
+    ) {
+      const initialParamValues: ParamValues = {};
+      selectedOperations.forEach((op) => {
+        initialParamValues[op] = {};
+        const params = OPERATION_SCHEMAS[op]?.params || [];
+        params.forEach((param) => {
+          if (param.defaultValue !== undefined) {
+            initialParamValues[op][param.name] = param.defaultValue;
+          }
+        });
+      });
+      setParamValues(initialParamValues);
+    } else {
+      form.setFieldsValue(paramValues);
+    }
+  }, [paramValues, form, selectedOperations, setParamValues]);
+
+  const visualSelectedOperations = getVisualSelectedOperations();
+  const paramNameConflicts = getParamNameConflicts(visualSelectedOperations);
 
   return (
     <Card className="ffmpeg-panel" title="FFmpeg 操作与配置">
-      <Form layout="vertical" form={form}>
-        <Form.Item label="操作类型" name="operation">
-          <Select
-            value={operation}
-            onChange={(value) => {
-              setOperation(value);
-              form.resetFields();
-            }}
-            options={OPERATION_OPTIONS}
-            style={{ width: "100%" }}
-          />
-        </Form.Item>
-        {renderParams()}
+      <div style={{ marginBottom: 16 }}>
+        <Row gutter={32} align="top">
+          <Col span={12}>
+            <div style={{ fontWeight: "bold", marginBottom: 4 }}>视频操作</div>
+            <Checkbox.Group
+              options={videoProcessOptions}
+              value={selectedOperations}
+              onChange={handleOperationChange}
+              style={{ display: "flex", flexDirection: "column" }}
+              disabled={selectedOperations.includes(formatConvertOp)} // 选中格式转换后禁用视频处理
+            />
+            <Divider style={{ margin: "16px 0 8px 0" }} />
+            <div style={{ fontWeight: "bold", marginBottom: 4 }}>格式转换</div>
+            <Checkbox
+              checked={selectedOperations.includes(formatConvertOp)}
+              onChange={(e) => {
+                if (e.target.checked) {
+                  // 格式转换互斥：只保留格式转换和音频操作
+                  handleOperationChange([
+                    formatConvertOp,
+                    ...selectedOperations.filter((op) => audioOps.includes(op)),
+                  ]);
+                } else {
+                  // 移除格式转换后，保留视频处理和音频操作
+                  handleOperationChange(
+                    selectedOperations.filter((op) => op !== formatConvertOp)
+                  );
+                }
+              }}
+            >
+              {formatConvertOption.label}
+            </Checkbox>
+          </Col>
+          <Col span={12}>
+            <div style={{ fontWeight: "bold", marginBottom: 4 }}>音频操作</div>
+            <Checkbox.Group
+              options={audioOptions}
+              value={selectedOperations}
+              onChange={handleOperationChange}
+              style={{ display: "flex", flexDirection: "column" }}
+            />
+          </Col>
+        </Row>
+        <Button
+          type="primary"
+          style={{ marginTop: 8, marginRight: 8 }}
+          onClick={handleSaveTemplate} // 使用hook中的函数
+        >
+          模板
+        </Button>
+      </div>
+      <Form
+        layout="vertical"
+        form={form}
+        initialValues={paramValues}
+        onValuesChange={handleValuesChange}
+      >
+        {/* 使用抽离的参数表单项组件 */}
+        <OperationParametersFormItems
+          visualSelectedOperations={visualSelectedOperations}
+        />
         <Divider />
-        <Form.Item>
-          <Button type="primary" onClick={handleProcess} loading={processing}>
-            {processing ? "处理中..." : "开始处理"}
-          </Button>
-        </Form.Item>
+        {/* 参数名冲突提示 */}
+        {paramNameConflicts.length > 0 && (
+          <Alert
+            message={
+              <span>
+                存在参数名冲突：
+                {paramNameConflicts.map(([name, arr]) => (
+                  <span key={name} style={{ marginLeft: 8 }}>
+                    <b>{name}</b>（{arr.join("、")}）
+                  </span>
+                ))}
+                ，请注意参数不会互相覆盖。
+              </span>
+            }
+            type="warning"
+            showIcon
+            style={{ marginBottom: 16 }}
+          />
+        )}
       </Form>
-      <Divider />
-      {processing && (
-        <Progress
-          percent={Math.round(progress)}
-          status={progress < 100 ? "active" : "success"}
-        />
-      )}
-      {result && (
-        <Alert
-          message={result}
-          type="success"
-          showIcon
-          style={{ marginTop: 16 }}
-        />
-      )}
-      {!processing && !result && (
-        <Alert
-          message="处理进度与结果将在此展示（UI占位）"
-          type="info"
-          showIcon
-        />
-      )}
+      {/* 使用抽离的模板管理模态框组件 */}
+      <TemplateManagementModal
+        modalOpen={modalOpen}
+        setModalOpen={setModalOpen}
+        templates={templates}
+        editingTemplateId={editingTemplateId}
+        newTplName={newTplName}
+        setNewTplName={setNewTplName}
+        handleCreateTemplate={handleCreateTemplate}
+        handleUpdateTemplate={handleUpdateTemplate}
+        handleOpenRenameModal={handleOpenRenameModal}
+        deleteTemplate={deleteTemplate}
+        applyTemplate={applyTemplate}
+        isSaveDisabled={selectedOperations.length === 0} // 传递disabled状态
+      />
+
+      {/* 使用抽离的重命名模板模态框组件 */}
+      <RenameTemplateModal
+        renameModalOpen={renameModalOpen}
+        handleRenameCancel={handleRenameCancel}
+        handleRenameSave={handleRenameSave}
+        renamingTemplate={renamingTemplate}
+        newTemplateName={newTemplateName}
+        setNewTemplateName={setNewTemplateName}
+      />
     </Card>
   );
 };

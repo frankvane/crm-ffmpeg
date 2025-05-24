@@ -1,0 +1,30 @@
+{
+    "sourceFile": "UPDATE.md",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 3,
+            "patches": [
+                {
+                    "date": 1748090622739,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1748090661202,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,1 +1,12 @@\n- \n\\ No newline at end of file\n+## 2025-05-24 12:43:34 (UTC)\r\n+\r\n+**代码重构:**\r\n+\r\n+*   将参数名冲突检测逻辑 (`getParamNameConflicts`) 抽离到 `src/components/FFmpegPanel/utils.ts` 工具文件中。\r\n+*   将参数表单项的渲染逻辑 (`renderParamItems`) 抽离到 `src/components/FFmpegPanel/OperationParametersFormItems.tsx` 组件中。\r\n+*   将模板管理相关的状态和逻辑抽离到 `src/components/FFmpegPanel/hooks/useTemplateManagement.ts` 自定义 hook 中。\r\n+*   将模板管理模态框 (`Modal` for `modalOpen`) 的 JSX 抽离到 `src/components/FFmpegPanel/TemplateManagementModal.tsx` 组件中。\r\n+*   将重命名模板模态框 (`Modal` for `renameModalOpen`) 的 JSX 抽离到 `src/components/FFmpegPanel/RenameTemplateModal.tsx` 组件中。\r\n+*   更新 `src/components/FFmpegPanel/index.tsx` 文件，使用抽离后的 hook 和组件，并移除相关的状态、逻辑和 JSX。\r\n+\r\n+// ... existing code ...\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1748090667451,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,12 +1,12 @@\n ## 2025-05-24 12:43:34 (UTC)\r\n \r\n **代码重构:**\r\n \r\n-*   将参数名冲突检测逻辑 (`getParamNameConflicts`) 抽离到 `src/components/FFmpegPanel/utils.ts` 工具文件中。\r\n-*   将参数表单项的渲染逻辑 (`renderParamItems`) 抽离到 `src/components/FFmpegPanel/OperationParametersFormItems.tsx` 组件中。\r\n-*   将模板管理相关的状态和逻辑抽离到 `src/components/FFmpegPanel/hooks/useTemplateManagement.ts` 自定义 hook 中。\r\n-*   将模板管理模态框 (`Modal` for `modalOpen`) 的 JSX 抽离到 `src/components/FFmpegPanel/TemplateManagementModal.tsx` 组件中。\r\n-*   将重命名模板模态框 (`Modal` for `renameModalOpen`) 的 JSX 抽离到 `src/components/FFmpegPanel/RenameTemplateModal.tsx` 组件中。\r\n-*   更新 `src/components/FFmpegPanel/index.tsx` 文件，使用抽离后的 hook 和组件，并移除相关的状态、逻辑和 JSX。\r\n+- 将参数名冲突检测逻辑 (`getParamNameConflicts`) 抽离到 `src/components/FFmpegPanel/utils.ts` 工具文件中。\r\n+- 将参数表单项的渲染逻辑 (`renderParamItems`) 抽离到 `src/components/FFmpegPanel/OperationParametersFormItems.tsx` 组件中。\r\n\\ No newline at end of file\n+- 将模板管理相关的状态和逻辑抽离到 `src/components/FFmpegPanel/hooks/useTemplateManagement.ts` 自定义 hook 中。\r\n+- 将模板管理模态框 (`Modal` for `modalOpen`) 的 JSX 抽离到 `src/components/FFmpegPanel/TemplateManagementModal.tsx` 组件中。\r\n+- 将重命名模板模态框 (`Modal` for `renameModalOpen`) 的 JSX 抽离到 `src/components/FFmpegPanel/RenameTemplateModal.tsx` 组件中。\r\n+- 更新 `src/components/FFmpegPanel/index.tsx` 文件，使用抽离后的 hook 和组件，并移除相关的状态、逻辑和 JSX。\r\n \r\n-// ... existing code ...\n+// ... existing code ...\r\n"
+                },
+                {
+                    "date": 1748090675103,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -8,5 +8,4 @@\n - 将模板管理模态框 (`Modal` for `modalOpen`) 的 JSX 抽离到 `src/components/FFmpegPanel/TemplateManagementModal.tsx` 组件中。\r\n - 将重命名模板模态框 (`Modal` for `renameModalOpen`) 的 JSX 抽离到 `src/components/FFmpegPanel/RenameTemplateModal.tsx` 组件中。\r\n - 更新 `src/components/FFmpegPanel/index.tsx` 文件，使用抽离后的 hook 和组件，并移除相关的状态、逻辑和 JSX。\r\n \r\n-// ... existing code ...\r\n"
+                }
+            ],
+            "date": 1748090622739,
+            "name": "Commit-0",
+            "content": " "
+        }
+    ]
+}

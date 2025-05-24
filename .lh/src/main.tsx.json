@@ -3,11 +3,19 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 2,
             "patches": [
                 {
                     "date": 1748065595903,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1748089625257,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,4 +1,29 @@\n+import \"./index.css\";\n+\n import App from \"./App.tsx\";\n-import { createRoot } from \"react-dom/client\";\n+import React from \"react\";\n+import ReactDOM from \"react-dom/client\";\n+// Import StagewiseToolbar for development\n+import { StagewiseToolbar } from \"@stagewise/toolbar-react\";\n \n-createRoot(document.getElementById(\"root\")!).render(<App />);\n+ReactDOM.createRoot(document.getElementById(\"root\")!).render(\n+  <React.StrictMode>\n+    <App />\n+  </React.StrictMode>\n+);\n+\n+// Initialize Stagewise Toolbar only in development\n+if (process.env.NODE_ENV === \"development\") {\n+  // Define Stagewise config\n+  const stagewiseConfig = {\n+    plugins: [],\n+  };\n+\n+  // Create a separate root for the toolbar\n+  const toolbarRootElement = document.createElement(\"div\");\n+  document.body.appendChild(toolbarRootElement);\n+  const toolbarRoot = ReactDOM.createRoot(toolbarRootElement);\n+\n+  // Render the toolbar\n+  toolbarRoot.render(<StagewiseToolbar config={stagewiseConfig} />);\n+}\n"
+                },
+                {
+                    "date": 1748089666189,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -5,13 +5,9 @@\n import ReactDOM from \"react-dom/client\";\n // Import StagewiseToolbar for development\n import { StagewiseToolbar } from \"@stagewise/toolbar-react\";\n \n-ReactDOM.createRoot(document.getElementById(\"root\")!).render(\n-  <React.StrictMode>\n-    <App />\n-  </React.StrictMode>\n-);\n+ReactDOM.createRoot(document.getElementById(\"root\")!).render(<App />);\n \n // Initialize Stagewise Toolbar only in development\n if (process.env.NODE_ENV === \"development\") {\n   // Define Stagewise config\n"
                 }
             ],
             "date": 1748065595903,
