@@ -3,11 +3,59 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 12,
             "patches": [
                 {
                     "date": 1748065581908,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1748094927594,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,9 +2,32 @@\n \n function App() {\n   return (\n     <div className=\"app-container\">\n-      <FFmpegPanel />\n+      <FileUploader\n+\t\t\t\taccept=\".png,.jpg,.jpeg,.gif,.exe,.rar,.mp4,.webm,video/*\"\n+\t\t\t\tallowedTypes={[\n+\t\t\t\t\t\"image/png\",\n+\t\t\t\t\t\"image/jpeg\",\n+\t\t\t\t\t\"image/gif\",\n+\t\t\t\t\t\"application/x-rar-compressed\",\n+\t\t\t\t\t\"application/x-msdownload\",\n+\t\t\t\t\t\"video/mp4\",\n+\t\t\t\t\t\"video/webm\",\n+\t\t\t\t\t\"video/ogg\",\n+\t\t\t\t\t\"video/x-msvideo\",\n+\t\t\t\t\t\"video/quicktime\",\n+\t\t\t\t]}\n+\t\t\t\tmaxSizeMB={300}\n+\t\t\t\tmultiple={true}\n+\t\t\t\tapiUrl=\"/api/file\"\n+\t\t\t\tkeepAfterUpload={false}\n+\t\t\t\tremoveDelayMs={1000}\n+\t\t\t\tonRemoveAfterUpload={(file, reason) => {\n+\t\t\t\t\tconsole.log(file, reason);\n+\t\t\t\t\treturn true;\n+\t\t\t\t}}\n+\t\t\t/>\n     </div>\n   );\n }\n \n"
+                },
+                {
+                    "date": 1748094937464,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,35 +1,33 @@\n-import \"./App.css\";\n+import FileUploader from \"./components/FileUploader\";\n \n-import FFmpegPanel from \"./components/FFmpegPanel\";\n-\n function App() {\n   return (\n     <div className=\"app-container\">\n       <FileUploader\n-\t\t\t\taccept=\".png,.jpg,.jpeg,.gif,.exe,.rar,.mp4,.webm,video/*\"\n-\t\t\t\tallowedTypes={[\n-\t\t\t\t\t\"image/png\",\n-\t\t\t\t\t\"image/jpeg\",\n-\t\t\t\t\t\"image/gif\",\n-\t\t\t\t\t\"application/x-rar-compressed\",\n-\t\t\t\t\t\"application/x-msdownload\",\n-\t\t\t\t\t\"video/mp4\",\n-\t\t\t\t\t\"video/webm\",\n-\t\t\t\t\t\"video/ogg\",\n-\t\t\t\t\t\"video/x-msvideo\",\n-\t\t\t\t\t\"video/quicktime\",\n-\t\t\t\t]}\n-\t\t\t\tmaxSizeMB={300}\n-\t\t\t\tmultiple={true}\n-\t\t\t\tapiUrl=\"/api/file\"\n-\t\t\t\tkeepAfterUpload={false}\n-\t\t\t\tremoveDelayMs={1000}\n-\t\t\t\tonRemoveAfterUpload={(file, reason) => {\n-\t\t\t\t\tconsole.log(file, reason);\n-\t\t\t\t\treturn true;\n-\t\t\t\t}}\n-\t\t\t/>\n+        accept=\".png,.jpg,.jpeg,.gif,.exe,.rar,.mp4,.webm,video/*\"\n+        allowedTypes={[\n+          \"image/png\",\n+          \"image/jpeg\",\n+          \"image/gif\",\n+          \"application/x-rar-compressed\",\n+          \"application/x-msdownload\",\n+          \"video/mp4\",\n+          \"video/webm\",\n+          \"video/ogg\",\n+          \"video/x-msvideo\",\n+          \"video/quicktime\",\n+        ]}\n+        maxSizeMB={300}\n+        multiple={true}\n+        apiUrl=\"/api/file\"\n+        keepAfterUpload={false}\n+        removeDelayMs={1000}\n+        onRemoveAfterUpload={(file, reason) => {\n+          console.log(file, reason);\n+          return true;\n+        }}\n+      />\n     </div>\n   );\n }\n \n"
+                },
+                {
+                    "date": 1748094995717,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -25,8 +25,11 @@\n         onRemoveAfterUpload={(file, reason) => {\n           console.log(file, reason);\n           return true;\n         }}\n+        onSuccess={(file) => {\n+          console.log(file);\n+        }}\n       />\n     </div>\n   );\n }\n"
+                },
+                {
+                    "date": 1748095063652,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -22,9 +22,8 @@\n         apiUrl=\"/api/file\"\n         keepAfterUpload={false}\n         removeDelayMs={1000}\n         onRemoveAfterUpload={(file, reason) => {\n-          console.log(file, reason);\n           return true;\n         }}\n         onSuccess={(file) => {\n           console.log(file);\n"
+                },
+                {
+                    "date": 1748095744827,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,9 +3,9 @@\n function App() {\n   return (\n     <div className=\"app-container\">\n       <FileUploader\n-        accept=\".png,.jpg,.jpeg,.gif,.exe,.rar,.mp4,.webm,video/*\"\n+        accept=\".png,.jpg,.jpeg,.gif,.exe,.rar,.mp4,.wmv,.webm,video/*\"\n         allowedTypes={[\n           \"image/png\",\n           \"image/jpeg\",\n           \"image/gif\",\n"
+                },
+                {
+                    "date": 1748095766692,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -15,15 +15,17 @@\n           \"video/webm\",\n           \"video/ogg\",\n           \"video/x-msvideo\",\n           \"video/quicktime\",\n+          \"video/x-ms-wmv\",\n         ]}\n         maxSizeMB={300}\n         multiple={true}\n         apiUrl=\"/api/file\"\n         keepAfterUpload={false}\n         removeDelayMs={1000}\n         onRemoveAfterUpload={(file, reason) => {\n+          console.log(file, reason);\n           return true;\n         }}\n         onSuccess={(file) => {\n           console.log(file);\n"
+                },
+                {
+                    "date": 1748096339761,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -26,10 +26,10 @@\n         onRemoveAfterUpload={(file, reason) => {\n           console.log(file, reason);\n           return true;\n         }}\n-        onSuccess={(file) => {\n-          console.log(file);\n+        onSuccess={(file,res) => {\n+          console.log(file,res);\n         }}\n       />\n     </div>\n   );\n"
+                },
+                {
+                    "date": 1748096664179,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -26,11 +26,14 @@\n         onRemoveAfterUpload={(file, reason) => {\n           console.log(file, reason);\n           return true;\n         }}\n-        onSuccess={(file,res) => {\n-          console.log(file,res);\n+        onSuccess={(file, res) => {\n+          console.log(file, res);\n         }}\n+        onMergeSuccess={(files, res) => {\n+          console.log(files, res);\n+        }}\n       />\n     </div>\n   );\n }\n"
+                },
+                {
+                    "date": 1748096692615,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -29,8 +29,11 @@\n         }}\n         onMergeSuccess={(files, res) => {\n           console.log(files, res);\n         }}\n+        onCheckSuccess={(files, res) => {\n+          console.log(files, res);\n+        }}\n       />\n     </div>\n   );\n }\n"
+                },
+                {
+                    "date": 1748096778609,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -29,11 +29,9 @@\n         }}\n         onMergeSuccess={(files, res) => {\n           console.log(files, res);\n         }}\n-        onCheckSuccess={(files, res) => {\n-          console.log(files, res);\n-        }}\n+        \n       />\n     </div>\n   );\n }\n"
+                },
+                {
+                    "date": 1748096814217,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -27,10 +27,13 @@\n           console.log(file, reason);\n           return true;\n         }}\n         onMergeSuccess={(files, res) => {\n-          console.log(res);\n+          console.log(files, res);\n         }}\n+        onCheckSuccess={(files, res) => {\n+          console.log(files, res);\n+        }}\n       />\n     </div>\n   );\n }\n"
+                },
+                {
+                    "date": 1748097019650,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,51 @@\n+import { Button, message } from \"antd\";\n+\n+import FFmpegPanel from \"./components/FFmpegPanel\";\n import FileUploader from \"./components/FileUploader\";\n+import { useFFmpegPanelStore } from \"./components/FFmpegPanel/store\";\n+import { useState } from \"react\";\n \n function App() {\n+  const [uploadedFile, setUploadedFile] = useState<any | null>(null);\n+  const { selectedOperations, paramValues } = useFFmpegPanelStore();\n+\n+  const handleFileUploadSuccess = (files: any[], res: any) => {\n+    console.log(\"File upload success:\", files, res);\n+    if (files && files.length > 0 && res) {\n+        setUploadedFile(res.fileInfo || files[0]);\n+        message.success(`文件 ${files[0].name} 上传成功！`);\n+    } else if (files && files.length > 0) {\n+        setUploadedFile(files[0]);\n+        message.success(`文件 ${files[0].name} 上传成功！`);\n+    }\n+  };\n+\n+  const handleStartConversion = async () => {\n+    if (!uploadedFile) {\n+      message.warning(\"请先上传文件！\");\n+      return;\n+    }\n+    if (selectedOperations.length === 0) {\n+      message.warning(\"请选择FFmpeg操作！\");\n+      return;\n+    }\n+\n+    const conversionPayload = {\n+      file: uploadedFile,\n+      operations: selectedOperations,\n+      params: paramValues,\n+    };\n+\n+    console.log(\"Starting conversion with payload:\", conversionPayload);\n+    message.info(\"开始调用FFmpeg转换接口...\");\n+\n+    setTimeout(() => {\n+      console.log(\"Simulated conversion API call successful.\");\n+      message.success(\"FFmpeg 转换请求（模拟）已发送！\");\n+    }, 1000);\n+  };\n+\n   return (\n     <div className=\"app-container\">\n       <FileUploader\n         accept=\".png,.jpg,.jpeg,.gif,.exe,.rar,.mp4,.wmv,.webm,video/*\"\n@@ -18,23 +62,38 @@\n           \"video/quicktime\",\n           \"video/x-ms-wmv\",\n         ]}\n         maxSizeMB={300}\n-        multiple={true}\n+        multiple={false}\n         apiUrl=\"/api/file\"\n-        keepAfterUpload={false}\n-        removeDelayMs={1000}\n+        keepAfterUpload={true}\n         onRemoveAfterUpload={(file, reason) => {\n           console.log(file, reason);\n+          if (uploadedFile && uploadedFile.uid === file.uid) {\n+              setUploadedFile(null);\n+          }\n           return true;\n         }}\n-        onMergeSuccess={(files, res) => {\n-          console.log(files, res);\n-        }}\n+        onMergeSuccess={handleFileUploadSuccess}\n         onCheckSuccess={(files, res) => {\n           console.log(files, res);\n         }}\n       />\n+\n+      {uploadedFile && (\n+        <>\n+          <FFmpegPanel />\n+          <Button\n+            type=\"primary\"\n+            size=\"large\"\n+            style={{ marginTop: 20 }}\n+            onClick={handleStartConversion}\n+            disabled={selectedOperations.length === 0}\n+          >\n+            开始FFmpeg转换\n+          </Button>\n+        </>\n+      )}\n     </div>\n   );\n }\n \n"
                 }
             ],
             "date": 1748065581908,

@@ -1,0 +1,26 @@
+{
+    "sourceFile": "src/components/FFmpegConvert/FFmpegList/index.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1748098884987,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1748099293837,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,9 @@\n import { List, Radio, Space, Typography } from \"antd\";\r\n import React, { useEffect } from \"react\";\r\n \r\n import styles from \"./style.module.less\";\r\n-import { useFFmpegPanelStore } from \"../../FFmpegPanel/store\"; // 引入FFmpegPanel store\r\n+import { useFFmpegPanelStore } from \"../store\"; // 更新导入路径\r\n \r\n // import { useFFmpegListStore } from \"./store\"; // 移除对FFmpegList store的引入\r\n \r\n const { Text } = Typography;\r\n"
+                },
+                {
+                    "date": 1748099301184,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -8,9 +8,9 @@\n \r\n const { Text } = Typography;\r\n \r\n const FFmpegList: React.FC = () => {\r\n-  const { templates, selectedTemplateId, loadTemplates, selectTemplate } =\r\n+  const { templates, selectedTemplateId, selectTemplate } =\r\n     // useFFmpegListStore(); // 使用FFmpegPanel store\r\n     useFFmpegPanelStore();\r\n \r\n   useEffect(() => {\r\n"
+                }
+            ],
+            "date": 1748098884987,
+            "name": "Commit-0",
+            "content": "import { List, Radio, Space, Typography } from \"antd\";\r\nimport React, { useEffect } from \"react\";\r\n\r\nimport styles from \"./style.module.less\";\r\nimport { useFFmpegPanelStore } from \"../../FFmpegPanel/store\"; // 引入FFmpegPanel store\r\n\r\n// import { useFFmpegListStore } from \"./store\"; // 移除对FFmpegList store的引入\r\n\r\nconst { Text } = Typography;\r\n\r\nconst FFmpegList: React.FC = () => {\r\n  const { templates, selectedTemplateId, loadTemplates, selectTemplate } =\r\n    // useFFmpegListStore(); // 使用FFmpegPanel store\r\n    useFFmpegPanelStore();\r\n\r\n  useEffect(() => {\r\n    // Load templates when the component mounts\r\n    // 注意：useFFmpegPanelStore中没有loadTemplates方法，需要调整或手动加载\r\n    // 暂时不调用loadTemplates，假设App.tsx或其他地方已经加载了模板\r\n    // loadTemplates(); // 移除loadTemplates调用，因为FFmpegPanel store中没有这个action\r\n    // 如果FFmpegPanelStore需要加载模板，可以在这里触发，但这取决于您的设计\r\n    // 例如：getTemplates(); // 假设FFmpegPanelStore有一个getTemplates action\r\n  }, []); // 依赖项列表清空，避免无限循环\r\n\r\n  const handleSelectTemplate = (templateId: string | null) => {\r\n    selectTemplate(templateId);\r\n    // TODO: Potentially update FFmpegPanel's state with selected template's operations and parameters\r\n    // This would involve either:\r\n    // 1. FFmpegList calling an action/function provided by FFmpegPanel or a shared store\r\n    // 2. App.tsx observing selectedTemplateId changes and updating FFmpegPanel's store\r\n    // 现在已经使用同一个store，可以直接在selectTemplate action中更新operation和params\r\n  };\r\n\r\n  // TODO: 在FFmpegPanel store中添加selectedTemplateId和selectTemplate action\r\n\r\n  return (\r\n    <div className={styles.ffmpegListContainer}>\r\n      <h2>FFmpeg 模板列表 (单选)</h2>\r\n      <List\r\n        dataSource={templates}\r\n        renderItem={(template) => (\r\n          <List.Item\r\n            actions={[\r\n              <Radio\r\n                checked={selectedTemplateId === template.id}\r\n                onClick={() =>\r\n                  handleSelectTemplate(\r\n                    selectedTemplateId === template.id ? null : template.id\r\n                  )\r\n                }\r\n              />,\r\n            ]}\r\n            className={styles.listItem}\r\n          >\r\n            <List.Item.Meta\r\n              title={<Text strong>{template.name}</Text>}\r\n              description={\r\n                <Space direction=\"vertical\" size={0}>\r\n                  <Text type=\"secondary\">\r\n                    操作: {template.operations.join(\", \")}\r\n                  </Text>\r\n                  {/* Display some parameter summary if needed */}\r\n                  {/* <Text type=\"secondary\">参数: ...</Text> */}\r\n                </Space>\r\n              }\r\n            />\r\n          </List.Item>\r\n        )}\r\n      />\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default FFmpegList;\r\n"
+        }
+    ]
+}

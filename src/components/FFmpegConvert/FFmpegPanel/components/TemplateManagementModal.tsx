@@ -1,6 +1,6 @@
 import { Alert, Button, Input, List, Modal, Popconfirm, Space } from "antd";
 
-import { FFmpegTemplate } from "./types";
+import { FFmpegTemplate } from "../types";
 import React from "react";
 
 interface TemplateManagementModalProps {

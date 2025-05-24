@@ -1,4 +1,4 @@
-import { FFmpegOperationType, FFmpegTemplate } from "./types";
+import { FFmpegOperationType, FFmpegTemplate } from "./FFmpegPanel/types";
 import { PersistStorage, persist } from "zustand/middleware";
 
 import { create } from "zustand";
@@ -8,6 +8,8 @@ interface FFmpegPanelState {
   selectedOperations: FFmpegOperationType[];
   paramValues: Record<string, Record<string, any>>; // 暂时使用 any
   templates: FFmpegTemplate[];
+  selectedTemplateId: string | null; // 新增状态
+  hasParamConflicts: boolean; // 新增冲突状态
   // 可以根据需要添加其他状态，如处理进度等
 }
 
@@ -24,6 +26,8 @@ interface FFmpegPanelActions {
   saveTemplate: (template: SavableFFmpegTemplate) => void;
   deleteTemplate: (id: string) => void;
   applyTemplate: (id: string) => void;
+  selectTemplate: (id: string | null) => void; // 新增 action
+  setHasParamConflicts: (hasConflicts: boolean) => void; // 新增设置冲突状态 action
 }
 
 // 实现 PersistStorage 接口的 customStorage 对象
@@ -55,6 +59,8 @@ export const useFFmpegPanelStore = create<
       selectedOperations: [],
       paramValues: {},
       templates: [], // 初始模板列表为空
+      selectedTemplateId: null, // 初始 selectedTemplateId 为 null
+      hasParamConflicts: false, // 初始无冲突
 
       // Actions
       // 修改 set 的用法，直接修改 draft state
@@ -109,6 +115,16 @@ export const useFFmpegPanelStore = create<
           });
           // TODO: 可能需要同步表单字段
         }
+      },
+      selectTemplate: (id) => {
+        set((state) => {
+          state.selectedTemplateId = id;
+        });
+      },
+      setHasParamConflicts: (hasConflicts) => {
+        set((state) => {
+          state.hasParamConflicts = hasConflicts;
+        });
       },
     })), // immer 中间件结束
     {

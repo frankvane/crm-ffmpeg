@@ -8,10 +8,10 @@ import {
   Select,
   Switch,
 } from "antd";
-import { FFmpegOperationType, FFmpegParamSchema } from "./types";
+import { FFmpegOperationType, FFmpegParamSchema } from "../types";
 import type { Rule, RuleObject } from "antd/es/form";
 
-import { OPERATION_SCHEMAS } from "./schemas";
+import { OPERATION_SCHEMAS } from "../schemas";
 import React from "react";
 
 interface OperationParametersFormItemsProps {

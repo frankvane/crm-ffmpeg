@@ -1,15 +1,15 @@
-import "./style.less";
+import "./styles/style.less";
 
 import { Alert, Button, Card, Checkbox, Col, Divider, Form, Row } from "antd";
 import { FFmpegOperationType, ParamValues } from "./types";
 import React, { useEffect } from "react";
 
 import { OPERATION_SCHEMAS } from "./schemas";
-import OperationParametersFormItems from "./OperationParametersFormItems";
-import RenameTemplateModal from "./RenameTemplateModal";
-import TemplateManagementModal from "./TemplateManagementModal";
+import OperationParametersFormItems from "./components/OperationParametersFormItems";
+import RenameTemplateModal from "./components/RenameTemplateModal";
+import TemplateManagementModal from "./components/TemplateManagementModal";
 import { getParamNameConflicts } from "./utils";
-import { useFFmpegPanelStore } from "./store";
+import { useFFmpegPanelStore } from "../store";
 import useTemplateManagement from "./hooks/useTemplateManagement";
 
 const FFmpegPanel: React.FC = () => {
@@ -19,6 +19,7 @@ const FFmpegPanel: React.FC = () => {
     paramValues,
     setSelectedOperations,
     setParamValues,
+    setHasParamConflicts,
   } = useFFmpegPanelStore();
 
   // 使用抽离的模板管理hook
@@ -57,17 +58,81 @@ const FFmpegPanel: React.FC = () => {
   const formatConvertOp: FFmpegOperationType = "convert";
   const audioOps: FFmpegOperationType[] = ["extract-audio", "volume"];
 
+  // 根据当前选择的操作，计算哪些其他操作会导致冲突或与格式转换互斥
+  const getDisabledOperations = () => {
+    const disabledOps: FFmpegOperationType[] = [];
+
+    const isConvertSelected = selectedOperations.includes(formatConvertOp);
+
+    // 如果已选择格式转换，禁用所有视频处理操作
+    if (isConvertSelected) {
+      videoProcessOps.forEach((op) => {
+        disabledOps.push(op);
+      });
+    } else {
+      // 如果未选择格式转换，遍历视频处理操作检查冲突
+      videoProcessOps.forEach((op) => {
+        // 检查将当前操作添加到已选操作中是否会引起冲突
+        // 已选操作中排除当前正在检查的 op，因为检查的是"添加"是否引起冲突
+        const otherSelectedOps = selectedOperations.filter(
+          (item) =>
+            item !== op && item !== formatConvertOp && !audioOps.includes(item)
+        );
+        const potentialOps = [...otherSelectedOps, op];
+        const conflicts = getParamNameConflicts(potentialOps);
+        if (conflicts.length > 0) {
+          // Check if the current op is involved in any newly created conflict
+          const opParams = OPERATION_SCHEMAS[op]?.params || [];
+          const opParamNames = new Set(opParams.map((p) => p.name));
+          for (const [paramName, conflictOps] of conflicts) {
+            // Check if the conflict involves a parameter of the current op AND another operation that was already selected
+            if (
+              opParamNames.has(paramName) &&
+              conflictOps.some((label) =>
+                otherSelectedOps
+                  .map((otherOp) => OPERATION_SCHEMAS[otherOp].label)
+                  .includes(label)
+              ) &&
+              conflictOps.includes(OPERATION_SCHEMAS[op].label)
+            ) {
+              disabledOps.push(op);
+              break; // Found a conflict involving this op and an already selected op, disable and move to next op
+            }
+          }
+        }
+      });
+    }
+
+    // 格式转换操作：如果已经选择了任何视频处理操作，则禁用格式转换
+    if (
+      selectedOperations.some((op) => videoProcessOps.includes(op)) &&
+      !isConvertSelected
+    ) {
+      disabledOps.push(formatConvertOp);
+    }
+
+    // 音频操作：目前假设音频操作之间以及音频操作与非格式转换的视频操作之间没有参数命名冲突
+    // 如果将来有冲突，需要添加类似视频处理的逻辑
+
+    return disabledOps;
+  };
+
+  const disabledOperations = getDisabledOperations();
+
   const videoProcessOptions = videoProcessOps.map((op) => ({
     label: OPERATION_SCHEMAS[op].label,
     value: op,
+    disabled: disabledOperations.includes(op),
   }));
   const formatConvertOption = {
     label: OPERATION_SCHEMAS[formatConvertOp].label,
     value: formatConvertOp,
+    disabled: disabledOperations.includes(formatConvertOp),
   };
   const audioOptions = audioOps.map((op) => ({
     label: OPERATION_SCHEMAS[op].label,
     value: op,
+    disabled: disabledOperations.includes(op),
   }));
 
   // 视觉顺序：视频处理、格式转换、音频
@@ -96,6 +161,7 @@ const FFmpegPanel: React.FC = () => {
 
     // 参数名冲突检测 (保留)
     const conflicts = getParamNameConflicts(newOps);
+    setHasParamConflicts(conflicts.length > 0);
     if (conflicts.length > 0) {
       // 这里只显示冲突信息，但不阻止选择，让用户自行决定
       console.warn("参数名冲突:", conflicts);
@@ -187,6 +253,7 @@ const FFmpegPanel: React.FC = () => {
                   );
                 }
               }}
+              disabled={disabledOperations.includes(formatConvertOp)}
             >
               {formatConvertOption.label}
             </Checkbox>

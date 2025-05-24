@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/components/FFmpegConvert/FFmpegPanel/utils.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1748101027388,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1748101027388,
+            "name": "Commit-0",
+            "content": "import { FFmpegOperationType, FFmpegParamSchema } from \"./types\";\r\n\r\nimport { OPERATION_SCHEMAS } from \"./schemas\";\r\n\r\n// 检查参数名冲突\r\nexport function getParamNameConflicts(\r\n  visualSelectedOperations: FFmpegOperationType[]\r\n) {\r\n  const nameMap: Record<string, string[]> = {};\r\n  visualSelectedOperations.forEach((op) => {\r\n    (OPERATION_SCHEMAS[op]?.params || []).forEach(\r\n      (param: FFmpegParamSchema) => {\r\n        if (!nameMap[param.name]) nameMap[param.name] = [];\r\n        nameMap[param.name].push(OPERATION_SCHEMAS[op].label);\r\n      }\r\n    );\r\n  });\r\n  return Object.entries(nameMap).filter(([, arr]) => arr.length > 1);\r\n}\r\n\r\n// 检查将某个操作添加到当前已选操作中是否会引起参数命名冲突\r\nexport function doesAddingOperationCauseConflict(\r\n  currentSelectedOperations: FFmpegOperationType[],\r\n  operationToAdd: FFmpegOperationType\r\n): boolean {\r\n  const currentParamNames = new Set<string>();\r\n  // 收集当前已选操作的所有参数名\r\n  currentSelectedOperations.forEach((op) => {\r\n    (OPERATION_SCHEMAS[op]?.params || []).forEach(param => {\r\n      currentParamNames.add(param.name);\r\n    });\r\n  });\r\n\r\n  // 检查待添加操作的参数名是否与当前已选操作的参数名冲突\r\n  const paramsOfOperationToAdd = OPERATION_SCHEMAS[operationToAdd]?.params || [];\r\n  for (const param of paramsOfOperationToAdd) {\r\n    if (currentParamNames.has(param.name)) {\r\n      return true; // 存在冲突\r\n    }\r\n  }\r\n\r\n  return false; // 无冲突\r\n}\r\n"
+        }
+    ]
+}

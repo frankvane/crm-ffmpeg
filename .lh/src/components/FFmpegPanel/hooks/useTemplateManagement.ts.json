@@ -3,11 +3,15 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 1,
             "patches": [
                 {
                     "date": 1748090353790,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1748090692885,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,10 +1,10 @@\n-import { FFmpegOperationType, ParamValues } from '../types';\r\n+import { FFmpegOperationType, ParamValues } from \"../types\";\r\n \r\n-import { FormInstance } from 'antd/lib/form';\r\n-import { message } from 'antd';\r\n-import { useFFmpegPanelStore } from '../store';\r\n-import { useState } from 'react';\r\n+import { FormInstance } from \"antd/lib/form\";\r\n+import { message } from \"antd\";\r\n+import { useFFmpegPanelStore } from \"../store\";\r\n+import { useState } from \"react\";\r\n \r\n interface UseTemplateManagementProps {\r\n   form: FormInstance; // 需要访问form实例来校验参数\r\n   selectedOperations: FFmpegOperationType[];\r\n@@ -24,12 +24,16 @@\n   const [newTplName, setNewTplName] = useState(\"\"); // 用于新建模板输入框\r\n \r\n   // 重命名模态框状态\r\n   const [renameModalOpen, setRenameModalOpen] = useState(false);\r\n-  const [renamingTemplate, setRenamingTemplate] = useState<{ id: string; name: string } | null>(null);\r\n+  const [renamingTemplate, setRenamingTemplate] = useState<{\r\n+    id: string;\r\n+    name: string;\r\n+  } | null>(null);\r\n   const [newTemplateName, setNewTemplateName] = useState(\"\"); // 用于重命名输入框\r\n \r\n-  const { templates, saveTemplate, deleteTemplate, applyTemplate } = useFFmpegPanelStore();\r\n+  const { templates, saveTemplate, deleteTemplate, applyTemplate } =\r\n+    useFFmpegPanelStore();\r\n \r\n   // 新建模板 (包含表单验证)\r\n   const handleCreateTemplate = async () => {\r\n     try {\r\n@@ -161,5 +165,5 @@\n     applyTemplate,\r\n   };\r\n };\r\n \r\n-export default useTemplateManagement;\n\\ No newline at end of file\n+export default useTemplateManagement;\r\n"
                 }
             ],
             "date": 1748090353790,

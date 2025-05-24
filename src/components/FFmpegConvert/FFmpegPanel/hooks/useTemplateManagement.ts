@@ -2,7 +2,7 @@ import { FFmpegOperationType, ParamValues } from "../types";
 
 import { FormInstance } from "antd/lib/form";
 import { message } from "antd";
-import { useFFmpegPanelStore } from "../store";
+import { useFFmpegPanelStore } from "../../store";
 import { useState } from "react";
 
 interface UseTemplateManagementProps {
