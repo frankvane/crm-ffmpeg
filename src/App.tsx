@@ -1,7 +1,6 @@
 import { Button, message } from "antd";
+import { FFmpegList, FFmpegPanel } from "./components/FFmpegConvert";
 
-import FFmpegList from "./components/FFmpegConvert/FFmpegList";
-import FFmpegPanel from "./components/FFmpegConvert/FFmpegPanel";
 import FileUploader from "./components/FileUploader";
 import { useFFmpegPanelStore } from "./components/FFmpegConvert/store";
 import { useState } from "react";
