@@ -79,58 +79,33 @@ const FFmpegPanel: React.FC = () => {
   const getDisabledOperations = () => {
     const disabledOps: FFmpegOperationType[] = [];
 
-    const isConvertSelected = selectedOperations.includes(formatConvertOp);
-
-    // 如果已选择格式转换，禁用所有视频处理操作
-    if (isConvertSelected) {
-      videoProcessOps.forEach((op) => {
-        disabledOps.push(op);
-      });
-    } else {
-      // 如果未选择格式转换，遍历视频处理操作检查冲突
-      videoProcessOps.forEach((op) => {
-        // 检查将当前操作添加到已选操作中是否会引起冲突
-        // 已选操作中排除当前正在检查的 op，因为检查的是"添加"是否引起冲突
-        const otherSelectedOps = selectedOperations.filter(
-          (item) =>
-            item !== op && item !== formatConvertOp && !audioOps.includes(item)
-        );
-        const potentialOps = [...otherSelectedOps, op];
-        const conflicts = getParamNameConflicts(potentialOps);
-        if (conflicts.length > 0) {
-          // Check if the current op is involved in any newly created conflict
-          const opParams = OPERATION_SCHEMAS[op]?.params || [];
-          const opParamNames = new Set(opParams.map((p) => p.name));
-          for (const [paramName, conflictOps] of conflicts) {
-            // Check if the conflict involves a parameter of the current op AND another operation that was already selected
-            if (
-              opParamNames.has(paramName) &&
-              conflictOps.some((label) =>
-                otherSelectedOps
-                  .map((otherOp) => OPERATION_SCHEMAS[otherOp].label)
-                  .includes(label)
-              ) &&
-              conflictOps.includes(OPERATION_SCHEMAS[op].label)
-            ) {
-              disabledOps.push(op);
-              break; // Found a conflict involving this op and an already selected op, disable and move to next op
-            }
+    // 只做参数名冲突检测，不再做格式转换与其它操作的互斥
+    const allOps = [...videoProcessOps, formatConvertOp, ...audioOps];
+    allOps.forEach((op) => {
+      // 检查将当前操作添加到已选操作中是否会引起冲突
+      const otherSelectedOps = selectedOperations.filter((item) => item !== op);
+      const potentialOps = [...otherSelectedOps, op];
+      const conflicts = getParamNameConflicts(potentialOps);
+      if (conflicts.length > 0) {
+        // Check if the current op是冲突的一部分
+        const opParams = OPERATION_SCHEMAS[op]?.params || [];
+        const opParamNames = new Set(opParams.map((p) => p.name));
+        for (const [paramName, conflictOps] of conflicts) {
+          if (
+            opParamNames.has(paramName) &&
+            conflictOps.some((label) =>
+              otherSelectedOps
+                .map((otherOp) => OPERATION_SCHEMAS[otherOp].label)
+                .includes(label)
+            ) &&
+            conflictOps.includes(OPERATION_SCHEMAS[op].label)
+          ) {
+            disabledOps.push(op);
+            break;
           }
         }
-      });
-    }
-
-    // 格式转换操作：如果已经选择了任何视频处理操作，则禁用格式转换
-    if (
-      selectedOperations.some((op) => videoProcessOps.includes(op)) &&
-      !isConvertSelected
-    ) {
-      disabledOps.push(formatConvertOp);
-    }
-
-    // 音频操作：目前假设音频操作之间以及音频操作与非格式转换的视频操作之间没有参数命名冲突
-    // 如果将来有冲突，需要添加类似视频处理的逻辑
-
+      }
+    });
     return disabledOps;
   };
 
@@ -162,39 +137,43 @@ const FFmpegPanel: React.FC = () => {
     return [...video, ...format, ...audio];
   };
 
-  // 处理操作类型多选 (包含互斥和参数名冲突检测)
+  // 推荐操作顺序
+  const operationOrder = [
+    "clip-segment",
+    "scale",
+    "compress",
+    "crop",
+    "watermark",
+    "framerate",
+    "gif",
+    "cover",
+    "extract-audio",
+    "volume",
+    "convert",
+  ];
+
+  // 处理操作类型多选 (包含参数名冲突检测)
   const handleOperationChange = (ops: Array<FFmpegOperationType>) => {
-    let newOps = [...ops];
-
-    // 格式转换互斥逻辑
-    if (newOps.includes(formatConvertOp)) {
-      newOps = [formatConvertOp, ...audioOps.filter((a) => newOps.includes(a))];
-    } else {
-      newOps = [
-        ...videoProcessOps.filter((v) => newOps.includes(v)),
-        ...audioOps.filter((a) => newOps.includes(a)),
-      ];
-    }
-
-    // 参数名冲突检测 (保留)
+    // 自动排序：clip-segment最前，convert最后，其它按推荐顺序
+    const newOps = [...ops].sort(
+      (a, b) => operationOrder.indexOf(a) - operationOrder.indexOf(b)
+    );
+    // 参数名冲突检测
     const conflicts = getParamNameConflicts(newOps);
     setHasParamConflicts(conflicts.length > 0);
     if (conflicts.length > 0) {
       // 这里只显示冲突信息，但不阻止选择，让用户自行决定
       console.warn("参数名冲突:", conflicts);
     }
-
     setSelectedOperations(newOps);
-
     // **新增逻辑：根据新的选中操作和当前值，计算并应用默认值**
-    const updatedParamValues: ParamValues = { ...paramValues }; // 保留现有参数值
+    const updatedParamValues: ParamValues = { ...paramValues };
     newOps.forEach((op) => {
       if (!updatedParamValues[op]) {
-        updatedParamValues[op] = {}; // 如果新操作没有对应的参数对象，则创建一个
+        updatedParamValues[op] = {};
       }
       const params = OPERATION_SCHEMAS[op]?.params || [];
       params.forEach((param) => {
-        // 如果参数在当前paramValues中没有值，且schema中有默认值，则设置默认值
         if (
           updatedParamValues[op][param.name] === undefined &&
           param.defaultValue !== undefined
@@ -203,9 +182,8 @@ const FFmpegPanel: React.FC = () => {
         }
       });
     });
-
     setParamValues(updatedParamValues);
-    form.setFieldsValue(updatedParamValues); // 同步到表单
+    form.setFieldsValue(updatedParamValues);
   };
 
   // 处理参数表单变更
@@ -309,7 +287,6 @@ const FFmpegPanel: React.FC = () => {
               value={selectedOperations}
               onChange={handleOperationChange}
               style={{ display: "flex", flexDirection: "column" }}
-              disabled={selectedOperations.includes(formatConvertOp)} // 选中格式转换后禁用视频处理
             />
             <Divider style={{ margin: "16px 0 8px 0" }} />
             <div style={{ fontWeight: "bold", marginBottom: 4 }}>格式转换</div>
@@ -317,13 +294,11 @@ const FFmpegPanel: React.FC = () => {
               checked={selectedOperations.includes(formatConvertOp)}
               onChange={(e) => {
                 if (e.target.checked) {
-                  // 格式转换互斥：只保留格式转换和音频操作
                   handleOperationChange([
+                    ...selectedOperations,
                     formatConvertOp,
-                    ...selectedOperations.filter((op) => audioOps.includes(op)),
                   ]);
                 } else {
-                  // 移除格式转换后，保留视频处理和音频操作
                   handleOperationChange(
                     selectedOperations.filter((op) => op !== formatConvertOp)
                   );
@@ -424,9 +399,6 @@ const FFmpegPanel: React.FC = () => {
         setModalOpen={setModalOpen}
         templates={templates}
         editingTemplateId={editingTemplateId}
-        newTplName={newTplName}
-        setNewTplName={setNewTplName}
-        handleCreateTemplate={() => handleCreateTemplate(newTplName)}
         handleUpdateTemplate={handleUpdateTemplate}
         handleOpenRenameModal={handleOpenRenameModal}
         deleteTemplate={deleteTemplate}

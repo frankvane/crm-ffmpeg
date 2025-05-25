@@ -1,9 +1,10 @@
 import { Button, message } from "antd";
 import { FFmpegList, FFmpegPanel } from "./components/FFmpegConvert";
+import { useEffect, useRef, useState } from "react";
 
 import FileUploader from "./components/FileUploader";
 import { useFFmpegPanelStore } from "./components/FFmpegConvert/store";
-import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 function App() {
   // 存储上传的文件信息，使用联合类型 File & { file_id: string } | null
@@ -12,11 +13,13 @@ function App() {
   >(null);
   const { templates, selectedTemplateId, hasParamConflicts } =
     useFFmpegPanelStore();
+  const [progress, setProgress] = useState<number>(0); // 进度百分比
+  const [progressStage, setProgressStage] = useState<string>(""); // 当前阶段
+  const wsRef = useRef<WebSocket | null>(null);
+  const [taskId, setTaskId] = useState<string | null>(null);
 
   // 合并处理文件上传成功和文件检查成功的逻辑
   const handleUploadSuccess = (file: File, res: any) => {
-    console.log("File upload/check success:", file, res);
-
     // 假设后端返回的文件信息在 res.file 中，并且包含 file_id
     if (res && res.file && res.file.file_id) {
       // 将后端返回的file_id和文件name合并到uploadedFile状态中
@@ -55,14 +58,42 @@ function App() {
       return;
     }
 
-    // 构建发送给后端的数据载荷
+    // 1. 生成 taskId
+    const newTaskId = uuidv4();
+    setTaskId(newTaskId);
+
+    // 2. 建立 WebSocket 连接
+    if (wsRef.current) {
+      wsRef.current.close();
+    }
+    const ws = new WebSocket("ws://localhost:3000");
+    wsRef.current = ws;
+
+    ws.onopen = () => {
+      ws.send(JSON.stringify({ taskId: newTaskId }));
+    };
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === "progress") {
+        setProgress(data.progress); // 更新进度
+        setProgressStage(data.stage || ""); // 更新阶段
+      }
+      // 可根据 data.type 处理其他类型消息
+    };
+    ws.onerror = (err) => {
+      message.error("WebSocket 连接出错");
+    };
+    ws.onclose = () => {
+      wsRef.current = null;
+    };
+
+    // 3. 构建发送给后端的数据载荷
     const conversionPayload = {
-      // 添加file_id到payload，用于后端识别文件
+      taskId: newTaskId,
       file: {
         file_id: uploadedFile.file_id, // 使用上传成功后返回的file_id
         name: uploadedFile.name, // 文件名
       },
-      // 使用选中模板的操作和参数
       operations: selectedTemplate.operations, // 选中的模板操作类型
       params: selectedTemplate.params, // 选中模板对应的参数值
     };
@@ -81,7 +112,7 @@ function App() {
         const result = await response.json();
         console.log("Conversion API response:", result);
         message.success("FFmpeg 转换请求已发送！");
-        // TODO: 根据后端返回更新处理状态和进度
+        // 这里不再 setProgress(0)，由 ws 进度驱动
       } else {
         console.error(
           "Conversion API error:",
@@ -95,6 +126,15 @@ function App() {
       message.error("FFmpeg 转换请求出错！");
     }
   };
+
+  // 组件卸载时关闭 ws
+  useEffect(() => {
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close();
+      }
+    };
+  }, []);
 
   return (
     <div className="app-container">
@@ -132,8 +172,33 @@ function App() {
         onCheckSuccess={handleUploadSuccess} // 使用合并后的处理函数
       />
 
+      {/* 进度条展示 */}
+      {taskId && (
+        <div style={{ margin: "20px 0" }}>
+          <div>
+            转换进度：{progress}%
+            {progressStage && (
+              <span style={{ marginLeft: 12, color: "#888" }}>
+                当前阶段：{progressStage}
+              </span>
+            )}
+          </div>
+          <div style={{ background: "#eee", height: 10, borderRadius: 5 }}>
+            <div
+              style={{
+                width: `${progress}%`,
+                height: 10,
+                background: "#1890ff",
+                borderRadius: 5,
+                transition: "width 0.3s",
+              }}
+            />
+          </div>
+        </div>
+      )}
+
       {/* FFmpeg模板列表 */}
-      {uploadedFile && ( // 只有文件上传成功后才显示模板列表和转换按钮
+      {uploadedFile && (
         <>
           <FFmpegList />
           <Button
@@ -141,7 +206,7 @@ function App() {
             size="large"
             style={{ marginTop: 20 }}
             onClick={handleStartConversion}
-            disabled={!selectedTemplateId || hasParamConflicts} // 同时检查 selectedTemplateId 和 hasParamConflicts
+            disabled={!selectedTemplateId || hasParamConflicts}
           >
             开始FFmpeg转换
           </Button>
