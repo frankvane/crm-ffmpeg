@@ -35,25 +35,24 @@ const useTemplateManagement = ({
     useFFmpegPanelStore();
 
   // 新建模板 (包含表单验证)
-  const handleCreateTemplate = async () => {
+  const handleCreateTemplate = async (name: string) => {
     try {
       await form.validateFields(); // 校验所有参数
     } catch {
       message.error("请先正确填写所有参数，再保存模板！");
       return;
     }
-    if (!newTplName.trim()) {
+    if (!name.trim()) {
       message.warning("请输入模板名称");
       return;
     }
     // 调用 saveTemplate 进行新增操作
     saveTemplate({
-      name: newTplName.trim(),
+      name: name.trim(),
       operations: selectedOperations,
       params: paramValues,
     });
     setNewTplName("");
-    message.success("模板已保存");
     setEditingTemplateId(null); // 新增后退出编辑模式
   };
 
@@ -88,7 +87,6 @@ const useTemplateManagement = ({
       createdAt: currentTemplate.createdAt,
     } as any); // 强制类型转换，因为 saveTemplate 参数类型是 SavableFFmpegTemplate
 
-    message.success("模板已更新");
     setEditingTemplateId(null); // 更新后退出编辑模式
     setModalOpen(false); // 关闭模态框
   };

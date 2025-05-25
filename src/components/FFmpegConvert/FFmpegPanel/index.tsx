@@ -1,14 +1,27 @@
 import "./styles/style.less";
 
-import { Alert, Button, Card, Checkbox, Col, Divider, Form, Row } from "antd";
+import {
+  Alert,
+  Button,
+  Card,
+  Checkbox,
+  Col,
+  Divider,
+  Form,
+  Input,
+  Modal,
+  Row,
+  Space,
+} from "antd";
 import { FFmpegOperationType, ParamValues } from "./types";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import { OPERATION_SCHEMAS } from "./schemas";
 import OperationParametersFormItems from "./components/OperationParametersFormItems";
 import RenameTemplateModal from "./components/RenameTemplateModal";
 import TemplateManagementModal from "./components/TemplateManagementModal";
 import { getParamNameConflicts } from "./utils";
+import { message } from "antd";
 import { useFFmpegPanelStore } from "../store";
 import useTemplateManagement from "./hooks/useTemplateManagement";
 
@@ -22,13 +35,18 @@ const FFmpegPanel: React.FC = () => {
     setHasParamConflicts,
   } = useFFmpegPanelStore();
 
+  // 新增：模式状态 new/edit
+  const [mode, setMode] = useState<"new" | "edit">("new");
+  // 新建模板弹窗状态
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [newTplName, setNewTplName] = useState("");
+
   // 使用抽离的模板管理hook
   const {
     modalOpen,
     setModalOpen,
     editingTemplateId,
-    newTplName,
-    setNewTplName,
+    setEditingTemplateId,
     renameModalOpen,
     renamingTemplate,
     newTemplateName,
@@ -36,7 +54,6 @@ const FFmpegPanel: React.FC = () => {
     templates,
     handleCreateTemplate,
     handleUpdateTemplate,
-    handleSaveTemplate,
     handleOpenRenameModal,
     handleRenameCancel,
     handleRenameSave,
@@ -222,8 +239,67 @@ const FFmpegPanel: React.FC = () => {
   const visualSelectedOperations = getVisualSelectedOperations();
   const paramNameConflicts = getParamNameConflicts(visualSelectedOperations);
 
+  // 编辑模板时，切换为edit模式
+  const handleEditTemplate = (tplId: string) => {
+    const tpl = templates.find((t) => t.id === tplId);
+    if (tpl) {
+      setSelectedOperations(tpl.operations);
+      setParamValues(tpl.params);
+      setMode("edit");
+      setEditingTemplateId(tplId);
+    }
+  };
+
+  // 新建模板弹窗确认
+  const handleCreateTemplateAndReset = async () => {
+    try {
+      await form.validateFields();
+      if (!newTplName.trim()) {
+        message.warning("请输入模板名称");
+        return;
+      }
+      // 保存模板，直接传递输入框的值
+      await handleCreateTemplate(newTplName.trim());
+      setCreateModalOpen(false);
+      setSelectedOperations([]);
+      setParamValues({});
+      setMode("new");
+      form.resetFields();
+      message.success("模板已保存");
+    } catch {
+      message.error("请先正确填写所有参数！");
+    }
+  };
+
+  // 确认修改后，清空参数并切回new模式
+  const handleConfirmEdit = async () => {
+    try {
+      await form.validateFields();
+      await handleUpdateTemplate();
+      setSelectedOperations([]);
+      setParamValues({});
+      setMode("new");
+      setEditingTemplateId(null);
+      form.resetFields();
+      message.success("模板已更新");
+    } catch {
+      message.error("请先正确填写所有参数！");
+    }
+  };
+
   return (
     <Card className="ffmpeg-panel" title="FFmpeg 操作与配置">
+      {/* 模式提示 */}
+      <Alert
+        message={
+          mode === "edit"
+            ? '编辑模式：请修改参数后点击"确认修改"'
+            : '新建模式：请填写参数后点击"新建模板"'
+        }
+        type={mode === "edit" ? "info" : "success"}
+        showIcon
+        style={{ marginBottom: 16 }}
+      />
       <div style={{ marginBottom: 16 }}>
         <Row gutter={32} align="top">
           <Col span={12}>
@@ -268,13 +344,19 @@ const FFmpegPanel: React.FC = () => {
             />
           </Col>
         </Row>
-        <Button
-          type="primary"
-          style={{ marginTop: 8, marginRight: 8 }}
-          onClick={handleSaveTemplate} // 使用hook中的函数
-        >
-          模板
-        </Button>
+        {/* 新建模板和模板管理按钮分离 */}
+        <Space style={{ marginTop: 8 }}>
+          <Button
+            type="primary"
+            onClick={() => setCreateModalOpen(true)}
+            disabled={selectedOperations.length === 0}
+          >
+            新建模板
+          </Button>
+          <Button onClick={() => setModalOpen(true)} type="default">
+            模板管理
+          </Button>
+        </Space>
       </div>
       <Form
         layout="vertical"
@@ -306,7 +388,36 @@ const FFmpegPanel: React.FC = () => {
             style={{ marginBottom: 16 }}
           />
         )}
+        {/* 确认修改按钮，仅在edit模式下显示 */}
+        {mode === "edit" && (
+          <Button
+            type="primary"
+            style={{ marginTop: 16, width: "100%" }}
+            onClick={handleConfirmEdit}
+          >
+            确认修改
+          </Button>
+        )}
       </Form>
+      {/* 新建模板弹窗 */}
+      <Modal
+        title="新建模板"
+        open={createModalOpen}
+        onCancel={() => {
+          setCreateModalOpen(false);
+          setNewTplName("");
+        }}
+        onOk={handleCreateTemplateAndReset}
+        okText="保存"
+        cancelText="取消"
+      >
+        <Input
+          placeholder="请输入模板名称"
+          value={newTplName}
+          onChange={(e) => setNewTplName(e.target.value)}
+          onPressEnter={handleCreateTemplateAndReset}
+        />
+      </Modal>
       {/* 使用抽离的模板管理模态框组件 */}
       <TemplateManagementModal
         modalOpen={modalOpen}
@@ -315,14 +426,17 @@ const FFmpegPanel: React.FC = () => {
         editingTemplateId={editingTemplateId}
         newTplName={newTplName}
         setNewTplName={setNewTplName}
-        handleCreateTemplate={handleCreateTemplate}
+        handleCreateTemplate={() => handleCreateTemplate(newTplName)}
         handleUpdateTemplate={handleUpdateTemplate}
         handleOpenRenameModal={handleOpenRenameModal}
         deleteTemplate={deleteTemplate}
-        applyTemplate={applyTemplate}
-        isSaveDisabled={selectedOperations.length === 0} // 传递disabled状态
+        applyTemplate={(tplId) => {
+          applyTemplate(tplId);
+          handleEditTemplate(tplId); // 进入编辑模式
+          setModalOpen(false);
+        }}
+        isSaveDisabled={selectedOperations.length === 0}
       />
-
       {/* 使用抽离的重命名模板模态框组件 */}
       <RenameTemplateModal
         renameModalOpen={renameModalOpen}

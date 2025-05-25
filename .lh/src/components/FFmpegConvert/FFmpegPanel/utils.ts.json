@@ -3,11 +3,15 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 1,
             "patches": [
                 {
                     "date": 1748101027388,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1748101551876,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -25,15 +25,16 @@\n ): boolean {\r\n   const currentParamNames = new Set<string>();\r\n   // 收集当前已选操作的所有参数名\r\n   currentSelectedOperations.forEach((op) => {\r\n-    (OPERATION_SCHEMAS[op]?.params || []).forEach(param => {\r\n+    (OPERATION_SCHEMAS[op]?.params || []).forEach((param) => {\r\n       currentParamNames.add(param.name);\r\n     });\r\n   });\r\n \r\n   // 检查待添加操作的参数名是否与当前已选操作的参数名冲突\r\n-  const paramsOfOperationToAdd = OPERATION_SCHEMAS[operationToAdd]?.params || [];\r\n+  const paramsOfOperationToAdd =\r\n+    OPERATION_SCHEMAS[operationToAdd]?.params || [];\r\n   for (const param of paramsOfOperationToAdd) {\r\n     if (currentParamNames.has(param.name)) {\r\n       return true; // 存在冲突\r\n     }\r\n"
                 }
             ],
             "date": 1748101027388,

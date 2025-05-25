@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 1,
+            "activePatchIndex": 3,
             "patches": [
                 {
                     "date": 1748099278912,
@@ -12,6 +12,14 @@
                 {
                     "date": 1748099493498,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,9 @@\n import { FFmpegOperationType, ParamValues } from \"../types\";\r\n \r\n import { FormInstance } from \"antd/lib/form\";\r\n import { message } from \"antd\";\r\n-import { useFFmpegPanelStore } from \"../store\";\r\n+import { useFFmpegPanelStore } from \"../../store\";\r\n import { useState } from \"react\";\r\n \r\n interface UseTemplateManagementProps {\r\n   form: FormInstance; // 需要访问form实例来校验参数\r\n"
+                },
+                {
+                    "date": 1748130634115,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -34,22 +34,22 @@\n   const { templates, saveTemplate, deleteTemplate, applyTemplate } =\r\n     useFFmpegPanelStore();\r\n \r\n   // 新建模板 (包含表单验证)\r\n-  const handleCreateTemplate = async () => {\r\n+  const handleCreateTemplate = async (name: string) => {\r\n     try {\r\n       await form.validateFields(); // 校验所有参数\r\n     } catch {\r\n       message.error(\"请先正确填写所有参数，再保存模板！\");\r\n       return;\r\n     }\r\n-    if (!newTplName.trim()) {\r\n+    if (!name.trim()) {\r\n       message.warning(\"请输入模板名称\");\r\n       return;\r\n     }\r\n     // 调用 saveTemplate 进行新增操作\r\n     saveTemplate({\r\n-      name: newTplName.trim(),\r\n+      name: name.trim(),\r\n       operations: selectedOperations,\r\n       params: paramValues,\r\n     });\r\n     setNewTplName(\"\");\r\n"
+                },
+                {
+                    "date": 1748130819705,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -52,9 +52,8 @@\n       operations: selectedOperations,\r\n       params: paramValues,\r\n     });\r\n     setNewTplName(\"\");\r\n-    message.success(\"模板已保存\");\r\n     setEditingTemplateId(null); // 新增后退出编辑模式\r\n   };\r\n \r\n   // 更新当前正在编辑的模板\r\n@@ -87,9 +86,8 @@\n       params: paramValues,\r\n       createdAt: currentTemplate.createdAt,\r\n     } as any); // 强制类型转换，因为 saveTemplate 参数类型是 SavableFFmpegTemplate\r\n \r\n-    message.success(\"模板已更新\");\r\n     setEditingTemplateId(null); // 更新后退出编辑模式\r\n     setModalOpen(false); // 关闭模态框\r\n   };\r\n \r\n"
                 }
             ],
             "date": 1748099278912,

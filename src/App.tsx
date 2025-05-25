@@ -67,31 +67,34 @@ function App() {
       operations: selectedTemplate.operations, // 选中的模板操作类型
       params: selectedTemplate.params, // 选中模板对应的参数值
     };
-    console.log("Starting conversion with payload:", conversionPayload);
 
     // TODO: 调用后端FFmpeg转换接口
-    // try {
-    //   const response = await fetch('/api/ffmpeg-convert', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify(conversionPayload),
-    //   });
+    try {
+      const response = await fetch("http://localhost:3000/api/ffmpeg-convert", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(conversionPayload),
+      });
 
-    //   if (response.ok) {
-    //     const result = await response.json();
-    //     console.log('Conversion API response:', result);
-    //     message.success('FFmpeg 转换请求已发送！');
-    //     // TODO: 根据后端返回更新处理状态和进度
-    //   } else {
-    //     console.error('Conversion API error:', response.status, response.statusText);
-    //     message.error('FFmpeg 转换请求失败！');
-    //   }
-    // } catch (error) {
-    //   console.error('Conversion API fetch error:', error);
-    //   message.error('FFmpeg 转换请求出错！');
-    // }
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Conversion API response:", result);
+        message.success("FFmpeg 转换请求已发送！");
+        // TODO: 根据后端返回更新处理状态和进度
+      } else {
+        console.error(
+          "Conversion API error:",
+          response.status,
+          response.statusText
+        );
+        message.error("FFmpeg 转换请求失败！");
+      }
+    } catch (error) {
+      console.error("Conversion API fetch error:", error);
+      message.error("FFmpeg 转换请求出错！");
+    }
   };
 
   return (

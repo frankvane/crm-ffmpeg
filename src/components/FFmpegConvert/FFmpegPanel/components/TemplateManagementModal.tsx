@@ -1,4 +1,4 @@
-import { Alert, Button, Input, List, Modal, Popconfirm, Space } from "antd";
+import { Alert, Button, List, Modal, Popconfirm } from "antd";
 
 import { FFmpegTemplate } from "../types";
 import React from "react";
@@ -8,14 +8,11 @@ interface TemplateManagementModalProps {
   setModalOpen: (open: boolean) => void;
   templates: FFmpegTemplate[];
   editingTemplateId: string | null;
-  newTplName: string;
-  setNewTplName: (name: string) => void;
-  handleCreateTemplate: () => void;
   handleUpdateTemplate: () => void;
   handleOpenRenameModal: (tpl: { id: string; name: string }) => void;
   deleteTemplate: (id: string) => void;
   applyTemplate: (id: string) => void;
-  isSaveDisabled: boolean; // 新增 prop，用于控制新建/更新按钮的disabled状态
+  isSaveDisabled: boolean;
 }
 
 const TemplateManagementModal: React.FC<TemplateManagementModalProps> = ({
@@ -23,9 +20,6 @@ const TemplateManagementModal: React.FC<TemplateManagementModalProps> = ({
   setModalOpen,
   templates,
   editingTemplateId,
-  newTplName,
-  setNewTplName,
-  handleCreateTemplate,
   handleUpdateTemplate,
   handleOpenRenameModal,
   deleteTemplate,
@@ -60,33 +54,14 @@ const TemplateManagementModal: React.FC<TemplateManagementModalProps> = ({
             showIcon
             style={{ marginBottom: 16 }}
           />
-        ) : (
-          // 如果不在编辑模式，显示新建输入框和按钮
-          <Space>
-            <Input
-              placeholder="新模板名称"
-              value={newTplName}
-              onChange={(e) => setNewTplName(e.target.value)}
-              style={{ width: 200 }}
-              onPressEnter={handleCreateTemplate}
-            />
-            <Button
-              type="primary"
-              onClick={handleCreateTemplate}
-              disabled={isSaveDisabled} // 使用传入的 prop
-            >
-              新建模板
-            </Button>
-          </Space>
-        )}
-        {/* 无论是否在编辑模式，如果当前有选中操作，都可以选择更新当前正在编辑的模板 */}
-        {/* 注意：这里简化处理，即使editingTemplateId为空，也可以显示更新按钮，点击后提示用户需要先选择一个模板编辑 */}
-        {editingTemplateId && ( // 只在编辑模式下显示更新按钮
+        ) : null}
+        {/* 只在编辑模式下显示更新按钮 */}
+        {editingTemplateId && (
           <Button
             type="primary"
             onClick={handleUpdateTemplate}
             style={{ marginLeft: 8 }}
-            disabled={isSaveDisabled} // 使用传入的 prop
+            disabled={isSaveDisabled}
           >
             更新模板
           </Button>
