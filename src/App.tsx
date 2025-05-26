@@ -19,6 +19,10 @@ function App() {
   const [progressStage, setProgressStage] = useState<string>(""); // 当前阶段
   const wsRef = useRef<WebSocket | null>(null);
   const [taskId, setTaskId] = useState<string | null>(null);
+  const [conversionStatus, setConversionStatus] = useState<
+    "idle" | "converting" | "completed" | "failed"
+  >("idle");
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
 
   // 合并处理文件上传成功和文件检查成功的逻辑
   const handleUploadSuccess = (file: File, res: any) => {
@@ -31,10 +35,14 @@ function App() {
         file_id: res.file.file_id, // 后端返回的文件ID
       });
       message.success(`文件 ${file.name} 处理成功！`); // 统一提示处理成功
+      setConversionStatus("idle"); // 上传新文件后重置状态
+      setDownloadUrl(null);
     } else {
       // 如果没有 file_id，显示错误并清空状态
       message.error(`文件 ${file.name} 处理成功，但未获取到文件ID！`);
       setUploadedFile(null);
+      setConversionStatus("idle");
+      setDownloadUrl(null);
     }
   };
 
@@ -63,6 +71,10 @@ function App() {
     // 1. 生成 taskId
     const newTaskId = uuidv4();
     setTaskId(newTaskId);
+    setConversionStatus("converting"); // 开始转换
+    setProgress(0);
+    setProgressStage("");
+    setDownloadUrl(null);
 
     // 2. 建立 WebSocket 连接
     if (wsRef.current) {
@@ -76,15 +88,29 @@ function App() {
     };
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      if (data.type === "progress") {
-        setProgress(data.progress); // 更新进度
-        setProgressStage(data.stage || ""); // 更新阶段
+      if (data.type === "status") {
+        if (data.status === "converting") setConversionStatus("converting");
+        if (data.status === "completed") {
+          setConversionStatus("completed");
+          setProgress(100);
+          setProgressStage("已完成");
+          message.success("转换完成！");
+        }
+        if (data.status === "failed") {
+          setConversionStatus("failed");
+          setProgressStage("失败");
+          message.error("转换失败！");
+        }
       }
-      // 可根据 data.type 处理其他类型消息
+      if (data.type === "progress") {
+        setProgress(data.progress);
+        setProgressStage(data.stage || "");
+      }
     };
     ws.onerror = (err) => {
       console.error("WebSocket error:", err);
       message.error("WebSocket 连接出错");
+      setConversionStatus("failed");
     };
     ws.onclose = () => {
       wsRef.current = null;
@@ -115,6 +141,13 @@ function App() {
         const result = await response.json();
         console.log("Conversion API response:", result);
         message.success("FFmpeg 转换请求已发送！");
+        // 立即设置下载链接（如果有）
+        if (result.data && result.data.outputVideoPath) {
+          // 假设静态资源可通过 / + 路径访问
+          setDownloadUrl(
+            `http://localhost:3000/${result.data.outputVideoPath}`
+          );
+        }
         // 这里不再 setProgress(0)，由 ws 进度驱动
       } else {
         console.error(
@@ -193,6 +226,8 @@ function App() {
             onRemoveAfterUpload={(file: File & { file_id?: string }) => {
               if (uploadedFile && uploadedFile.file_id === file.file_id) {
                 setUploadedFile(null);
+                setConversionStatus("idle");
+                setDownloadUrl(null);
               }
               return true;
             }}
@@ -201,7 +236,7 @@ function App() {
           />
         </Card>
         {/* 进度条展示 */}
-        {taskId && (
+        {taskId && conversionStatus === "converting" && (
           <Card
             style={{ borderRadius: 8, marginBottom: 24 }}
             styles={{ body: { padding: 16 } }}
@@ -229,6 +264,64 @@ function App() {
             </div>
           </Card>
         )}
+        {/* 转换完成提示与下载 */}
+        {taskId && conversionStatus === "completed" && (
+          <Card
+            style={{ borderRadius: 8, marginBottom: 24 }}
+            styles={{ body: { padding: 16 } }}
+          >
+            <div style={{ color: "#52c41a", fontWeight: 500, marginBottom: 8 }}>
+              转换已完成！
+            </div>
+            {downloadUrl ? (
+              <Button
+                type="primary"
+                href={downloadUrl}
+                target="_blank"
+                style={{ marginRight: 12 }}
+              >
+                下载结果文件
+              </Button>
+            ) : (
+              <span style={{ color: "#888" }}>等待后端返回下载链接...</span>
+            )}
+            <Button
+              onClick={() => {
+                setConversionStatus("idle");
+                setTaskId(null);
+                setProgress(0);
+                setProgressStage("");
+                setDownloadUrl(null);
+              }}
+              style={{ marginLeft: 12 }}
+            >
+              重新转换
+            </Button>
+          </Card>
+        )}
+        {/* 转换失败提示与重试 */}
+        {taskId && conversionStatus === "failed" && (
+          <Card
+            style={{ borderRadius: 8, marginBottom: 24 }}
+            styles={{ body: { padding: 16 } }}
+          >
+            <div style={{ color: "#ff4d4f", fontWeight: 500, marginBottom: 8 }}>
+              转换失败，请重试！
+            </div>
+            <Button
+              type="primary"
+              onClick={() => {
+                setConversionStatus("idle");
+                setTaskId(null);
+                setProgress(0);
+                setProgressStage("");
+                setDownloadUrl(null);
+              }}
+            >
+              重试
+            </Button>
+          </Card>
+        )}
         {/* FFmpeg模板列表 */}
         {uploadedFile && (
           <Button
@@ -236,9 +329,19 @@ function App() {
             size="large"
             style={{ marginTop: 20, width: "100%", borderRadius: 4 }}
             onClick={handleStartConversion}
-            disabled={!selectedTemplateId || hasParamConflicts}
+            disabled={
+              !selectedTemplateId ||
+              hasParamConflicts ||
+              conversionStatus === "converting"
+            }
           >
-            开始FFmpeg转换
+            {conversionStatus === "converting"
+              ? "转换中..."
+              : conversionStatus === "completed"
+              ? "已完成，可重新转换"
+              : conversionStatus === "failed"
+              ? "转换失败，可重试"
+              : "开始FFmpeg转换"}
           </Button>
         )}
       </div>
