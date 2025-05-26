@@ -10,6 +10,8 @@ interface FFmpegPanelState {
   templates: FFmpegTemplate[];
   selectedTemplateId: string | null; // 新增状态
   hasParamConflicts: boolean; // 新增冲突状态
+  mode: "new" | "edit"; // 新增模式状态
+  editingTemplateId: string | null; // 新增编辑模板ID
   // 可以根据需要添加其他状态，如处理进度等
 }
 
@@ -28,6 +30,8 @@ interface FFmpegPanelActions {
   applyTemplate: (id: string) => void;
   selectTemplate: (id: string | null) => void; // 新增 action
   setHasParamConflicts: (hasConflicts: boolean) => void; // 新增设置冲突状态 action
+  setMode: (mode: "new" | "edit") => void;
+  setEditingTemplateId: (id: string | null) => void;
 }
 
 // 实现 PersistStorage 接口的 customStorage 对象
@@ -61,6 +65,8 @@ export const useFFmpegPanelStore = create<
       templates: [], // 初始模板列表为空
       selectedTemplateId: null, // 初始 selectedTemplateId 为 null
       hasParamConflicts: false, // 初始无冲突
+      mode: "new", // 初始模式为 'new'
+      editingTemplateId: null, // 初始编辑模板ID为 null
 
       // Actions
       // 修改 set 的用法，直接修改 draft state
@@ -124,6 +130,16 @@ export const useFFmpegPanelStore = create<
       setHasParamConflicts: (hasConflicts) => {
         set((state) => {
           state.hasParamConflicts = hasConflicts;
+        });
+      },
+      setMode: (mode) => {
+        set((state: any) => {
+          state.mode = mode;
+        });
+      },
+      setEditingTemplateId: (id) => {
+        set((state: any) => {
+          state.editingTemplateId = id;
         });
       },
     })), // immer 中间件结束

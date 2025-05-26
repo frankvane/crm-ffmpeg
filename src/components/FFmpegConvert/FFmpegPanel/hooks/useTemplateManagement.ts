@@ -168,7 +168,6 @@ const useTemplateManagement = ({
     deleteTemplate,
     applyTemplate,
     selectTemplate,
-    setEditingTemplateId,
     setMode,
   };
 };

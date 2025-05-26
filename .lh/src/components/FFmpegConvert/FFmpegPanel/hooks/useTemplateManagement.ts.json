@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 5,
+            "activePatchIndex": 6,
             "patches": [
                 {
                     "date": 1748099278912,
@@ -28,6 +28,10 @@
                 {
                     "date": 1748264012147,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -36,8 +36,9 @@\n     saveTemplate,\r\n     deleteTemplate,\r\n     applyTemplate,\r\n     selectTemplate,\r\n+    setMode,\r\n   } = useFFmpegPanelStore();\r\n \r\n   // 新建模板 (包含表单验证)\r\n   const handleCreateTemplate = async (name: string) => {\r\n@@ -166,8 +167,10 @@\n     handleRenameCancel,\r\n     deleteTemplate,\r\n     applyTemplate,\r\n     selectTemplate,\r\n+    setEditingTemplateId,\r\n+    setMode,\r\n   };\r\n };\r\n \r\n export default useTemplateManagement;\r\n"
+                },
+                {
+                    "date": 1748273034308,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -167,9 +167,8 @@\n     handleRenameCancel,\r\n     deleteTemplate,\r\n     applyTemplate,\r\n     selectTemplate,\r\n-    setEditingTemplateId,\r\n     setMode,\r\n   };\r\n };\r\n \r\n"
                 }
             ],
             "date": 1748099278912,
