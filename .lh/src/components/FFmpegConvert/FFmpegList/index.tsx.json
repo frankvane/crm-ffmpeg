@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 8,
+            "activePatchIndex": 16,
             "patches": [
                 {
                     "date": 1748098884987,
@@ -40,6 +40,38 @@
                 {
                     "date": 1748265180645,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -86,95 +86,4 @@\n   );\r\n };\r\n \r\n export default FFmpegList;\r\n-import { List, Radio, Space, Typography } from \"antd\";\r\n-import React, { useEffect } from \"react\";\r\n-\r\n-import { FFmpegTemplate } from \"../FFmpegPanel/types\";\r\n-import styles from \"./style.module.less\";\r\n-import { useFFmpegPanelStore } from \"../store\"; // 更新导入路径\r\n-\r\n-// import { useFFmpegListStore } from \"./store\"; // 移除对FFmpegList store的引入\r\n-\r\n-const { Text } = Typography;\r\n-\r\n-interface FFmpegListProps {\r\n-  templates?: FFmpegTemplate[];\r\n-}\r\n-\r\n-const FFmpegList: React.FC<FFmpegListProps> = ({ templates }) => {\r\n-  const store = useFFmpegPanelStore();\r\n-  const { selectedTemplateId, selectTemplate } = store;\r\n-  const tplList = templates || store.templates;\r\n-\r\n-  useEffect(() => {\r\n-    // 预留加载逻辑\r\n-  }, []);\r\n-\r\n-  const handleSelectTemplate = (templateId: string | null) => {\r\n-    selectTemplate(templateId);\r\n-    // TODO: Potentially update FFmpegPanel's state with selected template's operations and parameters\r\n-    // This would involve either:\r\n-    // 1. FFmpegList calling an action/function provided by FFmpegPanel or a shared store\r\n-    // 2. App.tsx observing selectedTemplateId changes and updating FFmpegPanel's store\r\n-    // 现在已经使用同一个store，可以直接在selectTemplate action中更新operation和params\r\n-  };\r\n-\r\n-  // TODO: 在FFmpegPanel store中添加selectedTemplateId和selectTemplate action\r\n-\r\n-  return (\r\n-    <div className={styles.ffmpegListContainer}>\r\n-      <List\r\n-        dataSource={tplList}\r\n-        pagination={{\r\n-          pageSize: 5,\r\n-          showSizeChanger: true,\r\n-          pageSizeOptions: [\"5\", \"10\", \"20\", \"50\"],\r\n-          showTotal: (total, range) =>\r\n-            `第${range[0]}-${range[1]}条，共${total}条`,\r\n-          locale: {\r\n-            items_per_page: \"条/页\",\r\n-            jump_to: \"跳至\",\r\n-            jump_to_confirm: \"确定\",\r\n-            next_page: \"下一页\",\r\n-            prev_page: \"上一页\",\r\n-            prev_5: \"向前 5 页\",\r\n-            next_5: \"向后 5 页\",\r\n-            prev_3: \"向前 3 页\",\r\n-            next_3: \"向后 3 页\",\r\n-          },\r\n-        }}\r\n-        renderItem={(template) => (\r\n-          <List.Item\r\n-            actions={[\r\n-              <Radio\r\n-                checked={selectedTemplateId === template.id}\r\n-                onClick={() =>\r\n-                  handleSelectTemplate(\r\n-                    selectedTemplateId === template.id ? null : template.id\r\n-                  )\r\n-                }\r\n-              />,\r\n-            ]}\r\n-            className={styles.listItem}\r\n-          >\r\n-            <List.Item.Meta\r\n-              title={<Text strong>{template.name}</Text>}\r\n-              description={\r\n-                <Space direction=\"vertical\" size={0}>\r\n-                  <Text type=\"secondary\">\r\n-                    操作: {template.operations.join(\", \")}\r\n-                  </Text>\r\n-                  {/* Display some parameter summary if needed */}\r\n-                  {/* <Text type=\"secondary\">参数: ...</Text> */}\r\n-                </Space>\r\n-              }\r\n-            />\r\n-          </List.Item>\r\n-        )}\r\n-      />\r\n-    </div>\r\n-  );\r\n-};\r\n-\r\n-export default FFmpegList;\r\n"
+                },
+                {
+                    "date": 1748269254098,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -62,8 +62,9 @@\n                   handleSelectTemplate(\r\n                     selectedTemplateId === template.id ? null : template.id\r\n                   )\r\n                 }\r\n+                className={styles.radioCustom}\r\n               />,\r\n             ]}\r\n             className={styles.listItem}\r\n           >\r\n"
+                },
+                {
+                    "date": 1748269350689,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -23,17 +23,10 @@\n   }, []);\r\n \r\n   const handleSelectTemplate = (templateId: string | null) => {\r\n     selectTemplate(templateId);\r\n-    // TODO: Potentially update FFmpegPanel's state with selected template's operations and parameters\r\n-    // This would involve either:\r\n-    // 1. FFmpegList calling an action/function provided by FFmpegPanel or a shared store\r\n-    // 2. App.tsx observing selectedTemplateId changes and updating FFmpegPanel's store\r\n-    // 现在已经使用同一个store，可以直接在selectTemplate action中更新operation和params\r\n   };\r\n \r\n-  // TODO: 在FFmpegPanel store中添加selectedTemplateId和selectTemplate action\r\n-\r\n   return (\r\n     <div className={styles.ffmpegListContainer}>\r\n       <List\r\n         dataSource={tplList}\r\n"
+                },
+                {
+                    "date": 1748269357882,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -16,13 +16,8 @@\n const FFmpegList: React.FC<FFmpegListProps> = ({ templates }) => {\r\n   const store = useFFmpegPanelStore();\r\n   const { selectedTemplateId, selectTemplate } = store;\r\n   const tplList = templates || store.templates;\r\n-\r\n-  useEffect(() => {\r\n-    // 预留加载逻辑\r\n-  }, []);\r\n-\r\n   const handleSelectTemplate = (templateId: string | null) => {\r\n     selectTemplate(templateId);\r\n   };\r\n \r\n"
+                },
+                {
+                    "date": 1748269365948,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,8 @@\n import { List, Radio, Space, Typography } from \"antd\";\r\n-import React, { useEffect } from \"react\";\r\n \r\n import { FFmpegTemplate } from \"../FFmpegPanel/types\";\r\n+import React from \"react\";\r\n import styles from \"./style.module.less\";\r\n import { useFFmpegPanelStore } from \"../store\"; // 更新导入路径\r\n \r\n // import { useFFmpegListStore } from \"./store\"; // 移除对FFmpegList store的引入\r\n"
+                },
+                {
+                    "date": 1748269374757,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,10 +4,8 @@\n import React from \"react\";\r\n import styles from \"./style.module.less\";\r\n import { useFFmpegPanelStore } from \"../store\"; // 更新导入路径\r\n \r\n-// import { useFFmpegListStore } from \"./store\"; // 移除对FFmpegList store的引入\r\n-\r\n const { Text } = Typography;\r\n \r\n interface FFmpegListProps {\r\n   templates?: FFmpegTemplate[];\r\n"
+                },
+                {
+                    "date": 1748269386943,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -60,10 +60,8 @@\n                 <Space direction=\"vertical\" size={0}>\r\n                   <Text type=\"secondary\">\r\n                     操作: {template.operations.join(\", \")}\r\n                   </Text>\r\n-                  {/* Display some parameter summary if needed */}\r\n-                  {/* <Text type=\"secondary\">参数: ...</Text> */}\r\n                 </Space>\r\n               }\r\n             />\r\n           </List.Item>\r\n"
+                },
+                {
+                    "date": 1748269401771,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -56,9 +56,9 @@\n           >\r\n             <List.Item.Meta\r\n               title={<Text strong>{template.name}</Text>}\r\n               description={\r\n-                <Space direction=\"vertical\" size={0}>\r\n+                <Space direction=\"vertical\" size={50}>\r\n                   <Text type=\"secondary\">\r\n                     操作: {template.operations.join(\", \")}\r\n                   </Text>\r\n                 </Space>\r\n"
+                },
+                {
+                    "date": 1748269444180,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -56,9 +56,9 @@\n           >\r\n             <List.Item.Meta\r\n               title={<Text strong>{template.name}</Text>}\r\n               description={\r\n-                <Space direction=\"vertical\" size={50}>\r\n+                <Space direction=\"vertical\" size={0}>\r\n                   <Text type=\"secondary\">\r\n                     操作: {template.operations.join(\", \")}\r\n                   </Text>\r\n                 </Space>\r\n"
                 }
             ],
             "date": 1748098884987,

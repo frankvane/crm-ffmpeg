@@ -47,7 +47,6 @@ export const OPERATION_SCHEMAS: FFmpegSchemaMap = {
         type: "select",
         options: [
           { label: "MP3", value: "mp3" },
-          { label: "AAC", value: "aac" },
           { label: "WAV", value: "wav" },
         ],
         placeholder: "选择格式",

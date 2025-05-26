@@ -12,3 +12,23 @@
 .listItem:hover {
   background: #f5f7fa;
 }
+
+.radioCustom {
+  accent-color: #a1a1a1;
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  vertical-align: middle;
+  // 兼容 antd Radio
+  :global(.ant-radio-inner) {
+    border-color: #a1a1a1;
+    background: #fff;
+  }
+  :global(.ant-radio-checked .ant-radio-inner) {
+    border-color: #a1a1a1;
+    background: #a1a1a1;
+  }
+  :global(.ant-radio-inner::after) {
+    background-color: #fff;
+  }
+}
