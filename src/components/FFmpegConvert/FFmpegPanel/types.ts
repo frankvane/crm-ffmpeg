@@ -23,6 +23,7 @@ export interface FFmpegParamSchema {
   placeholder?: string;
   options?: { label: string; value: string | number }[];
   defaultValue?: number | string | boolean;
+  description?: string;
 }
 
 export interface FFmpegOperationSchema {

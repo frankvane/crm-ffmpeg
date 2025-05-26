@@ -12,6 +12,9 @@ interface TemplateManagementModalProps {
   handleOpenRenameModal: (tpl: { id: string; name: string }) => void;
   deleteTemplate: (id: string) => void;
   applyTemplate: (id: string) => void;
+  selectTemplate: (id: string) => void;
+  setEditingTemplateId: (id: string | null) => void;
+  setMode: (mode: "new" | "edit") => void;
   isSaveDisabled: boolean;
 }
 
@@ -24,6 +27,9 @@ const TemplateManagementModal: React.FC<TemplateManagementModalProps> = ({
   handleOpenRenameModal,
   deleteTemplate,
   applyTemplate,
+  selectTemplate,
+  setEditingTemplateId,
+  setMode,
   isSaveDisabled,
 }) => {
   return (
@@ -73,28 +79,17 @@ const TemplateManagementModal: React.FC<TemplateManagementModalProps> = ({
         renderItem={(tpl) => (
           <List.Item
             actions={[
-              // 应用模板按钮
-              <Button
-                key="apply"
-                size="small"
-                type="link"
-                onClick={() => {
-                  applyTemplate(tpl.id);
-                  setModalOpen(false); // Close modal after applying
-                  // setEditingTemplateId(null); // 这个状态的管理现在由 useTemplateManagement 负责
-                }}
-              >
-                应用
-              </Button>,
               // 编辑按钮
               <Button
                 key="edit"
                 size="small"
                 type="link"
                 onClick={() => {
-                  applyTemplate(tpl.id); // 应用模板内容到主面板
-                  // setEditingTemplateId(tpl.id); // 这个状态的管理现在由 useTemplateManagement 负责
-                  setModalOpen(false); // 关闭模态框
+                  applyTemplate(tpl.id);
+                  selectTemplate(tpl.id);
+                  setEditingTemplateId(tpl.id); // 进入编辑模式
+                  setMode("edit");
+                  setModalOpen(false);
                 }}
               >
                 编辑

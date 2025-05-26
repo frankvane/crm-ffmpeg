@@ -31,8 +31,14 @@ const useTemplateManagement = ({
   } | null>(null);
   const [newTemplateName, setNewTemplateName] = useState(""); // 用于重命名输入框
 
-  const { templates, saveTemplate, deleteTemplate, applyTemplate } =
-    useFFmpegPanelStore();
+  const {
+    templates,
+    saveTemplate,
+    deleteTemplate,
+    applyTemplate,
+    selectTemplate,
+    setMode,
+  } = useFFmpegPanelStore();
 
   // 新建模板 (包含表单验证)
   const handleCreateTemplate = async (name: string) => {
@@ -161,6 +167,9 @@ const useTemplateManagement = ({
     handleRenameCancel,
     deleteTemplate,
     applyTemplate,
+    selectTemplate,
+    setEditingTemplateId,
+    setMode,
   };
 };
 

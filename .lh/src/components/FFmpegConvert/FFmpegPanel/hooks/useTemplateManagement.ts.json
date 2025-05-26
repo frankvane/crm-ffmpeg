@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 3,
+            "activePatchIndex": 5,
             "patches": [
                 {
                     "date": 1748099278912,
@@ -20,6 +20,14 @@
                 {
                     "date": 1748130819705,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -52,9 +52,8 @@\n       operations: selectedOperations,\r\n       params: paramValues,\r\n     });\r\n     setNewTplName(\"\");\r\n-    message.success(\"模板已保存\");\r\n     setEditingTemplateId(null); // 新增后退出编辑模式\r\n   };\r\n \r\n   // 更新当前正在编辑的模板\r\n@@ -87,9 +86,8 @@\n       params: paramValues,\r\n       createdAt: currentTemplate.createdAt,\r\n     } as any); // 强制类型转换，因为 saveTemplate 参数类型是 SavableFFmpegTemplate\r\n \r\n-    message.success(\"模板已更新\");\r\n     setEditingTemplateId(null); // 更新后退出编辑模式\r\n     setModalOpen(false); // 关闭模态框\r\n   };\r\n \r\n"
+                },
+                {
+                    "date": 1748263873999,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -30,10 +30,15 @@\n     name: string;\r\n   } | null>(null);\r\n   const [newTemplateName, setNewTemplateName] = useState(\"\"); // 用于重命名输入框\r\n \r\n-  const { templates, saveTemplate, deleteTemplate, applyTemplate } =\r\n-    useFFmpegPanelStore();\r\n+  const {\r\n+    templates,\r\n+    saveTemplate,\r\n+    deleteTemplate,\r\n+    applyTemplate,\r\n+    selectTemplate,\r\n+  } = useFFmpegPanelStore();\r\n \r\n   // 新建模板 (包含表单验证)\r\n   const handleCreateTemplate = async (name: string) => {\r\n     try {\r\n@@ -160,8 +165,9 @@\n     handleRenameSave,\r\n     handleRenameCancel,\r\n     deleteTemplate,\r\n     applyTemplate,\r\n+    selectTemplate,\r\n   };\r\n };\r\n \r\n export default useTemplateManagement;\r\n"
+                },
+                {
+                    "date": 1748264012147,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -36,8 +36,9 @@\n     saveTemplate,\r\n     deleteTemplate,\r\n     applyTemplate,\r\n     selectTemplate,\r\n+    setMode,\r\n   } = useFFmpegPanelStore();\r\n \r\n   // 新建模板 (包含表单验证)\r\n   const handleCreateTemplate = async (name: string) => {\r\n@@ -166,8 +167,10 @@\n     handleRenameCancel,\r\n     deleteTemplate,\r\n     applyTemplate,\r\n     selectTemplate,\r\n+    setEditingTemplateId,\r\n+    setMode,\r\n   };\r\n };\r\n \r\n export default useTemplateManagement;\r\n"
                 }
             ],
             "date": 1748099278912,

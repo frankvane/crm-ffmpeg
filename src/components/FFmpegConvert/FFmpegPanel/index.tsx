@@ -59,6 +59,7 @@ const FFmpegPanel: React.FC = () => {
     handleRenameSave,
     deleteTemplate,
     applyTemplate,
+    selectTemplate,
   } = useTemplateManagement({ form, selectedOperations, paramValues });
 
   // 定义操作类型分组和对应的Antd Checkbox options
@@ -217,17 +218,6 @@ const FFmpegPanel: React.FC = () => {
   const visualSelectedOperations = getVisualSelectedOperations();
   const paramNameConflicts = getParamNameConflicts(visualSelectedOperations);
 
-  // 编辑模板时，切换为edit模式
-  const handleEditTemplate = (tplId: string) => {
-    const tpl = templates.find((t) => t.id === tplId);
-    if (tpl) {
-      setSelectedOperations(tpl.operations);
-      setParamValues(tpl.params);
-      setMode("edit");
-      setEditingTemplateId(tplId);
-    }
-  };
-
   // 新建模板弹窗确认
   const handleCreateTemplateAndReset = async () => {
     try {
@@ -323,7 +313,10 @@ const FFmpegPanel: React.FC = () => {
         <Space style={{ marginTop: 8 }}>
           <Button
             type="primary"
-            onClick={() => setCreateModalOpen(true)}
+            onClick={() => {
+              setCreateModalOpen(true);
+              setNewTplName("");
+            }}
             disabled={selectedOperations.length === 0}
           >
             新建模板
@@ -370,7 +363,7 @@ const FFmpegPanel: React.FC = () => {
             style={{ marginTop: 16, width: "100%" }}
             onClick={handleConfirmEdit}
           >
-            确认修改
+            保存设置
           </Button>
         )}
       </Form>
@@ -404,9 +397,12 @@ const FFmpegPanel: React.FC = () => {
         deleteTemplate={deleteTemplate}
         applyTemplate={(tplId) => {
           applyTemplate(tplId);
-          handleEditTemplate(tplId); // 进入编辑模式
+          selectTemplate(tplId);
           setModalOpen(false);
         }}
+        selectTemplate={selectTemplate}
+        setEditingTemplateId={setEditingTemplateId}
+        setMode={setMode}
         isSaveDisabled={selectedOperations.length === 0}
       />
       {/* 使用抽离的重命名模板模态框组件 */}

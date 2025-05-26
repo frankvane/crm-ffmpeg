@@ -132,8 +132,10 @@ export const useFFmpegPanelStore = create<
       storage: customStorage, // 使用 customStorage 对象
       // partialize 保持不变，因为它定义了哪些状态被持久化
       partialize: (state) =>
-        ({ templates: state.templates } as FFmpegPanelState &
-          FFmpegPanelActions),
+        ({
+          templates: state.templates,
+          selectedTemplateId: state.selectedTemplateId, // 持久化选中模板ID
+        } as FFmpegPanelState & FFmpegPanelActions),
     }
   )
 );

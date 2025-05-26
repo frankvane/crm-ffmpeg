@@ -7,6 +7,7 @@ import {
   Row,
   Select,
   Switch,
+  Tooltip,
 } from "antd";
 import { FFmpegOperationType, FFmpegParamSchema } from "../types";
 import type { Rule, RuleObject } from "antd/es/form";
@@ -78,15 +79,23 @@ const OperationParametersFormItems: React.FC<
       }
 
       let node: React.ReactNode = null;
+      const labelNode = param.description ? (
+        <Tooltip title={param.description}>
+          <span>{param.label}</span>
+        </Tooltip>
+      ) : (
+        param.label
+      );
       switch (param.type) {
         case "number":
           node = (
             <Form.Item
               key={itemKey}
-              label={param.label}
+              label={labelNode}
               name={itemName}
               rules={rules}
               style={{ marginBottom: 16 }}
+              extra={param.description}
             >
               <InputNumber
                 min={param.min}
@@ -102,10 +111,11 @@ const OperationParametersFormItems: React.FC<
           node = (
             <Form.Item
               key={itemKey}
-              label={param.label}
+              label={labelNode}
               name={itemName}
               rules={rules}
               style={{ marginBottom: 16 }}
+              extra={param.description}
             >
               <Select placeholder={param.placeholder} options={param.options} />
             </Form.Item>
@@ -115,10 +125,11 @@ const OperationParametersFormItems: React.FC<
           node = (
             <Form.Item
               key={itemKey}
-              label={param.label}
+              label={labelNode}
               name={itemName}
               rules={rules}
               style={{ marginBottom: 16 }}
+              extra={param.description}
             >
               <Input placeholder={param.placeholder} />
             </Form.Item>
@@ -128,11 +139,12 @@ const OperationParametersFormItems: React.FC<
           node = (
             <Form.Item
               key={itemKey}
-              label={param.label}
+              label={labelNode}
               name={itemName}
               valuePropName="checked" // For Switch component
               rules={rules}
               style={{ marginBottom: 16 }}
+              extra={param.description}
             >
               <Switch />
             </Form.Item>

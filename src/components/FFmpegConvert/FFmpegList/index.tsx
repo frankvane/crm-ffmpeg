@@ -1,6 +1,7 @@
 import { List, Radio, Space, Typography } from "antd";
 import React, { useEffect } from "react";
 
+import { FFmpegTemplate } from "../FFmpegPanel/types";
 import styles from "./style.module.less";
 import { useFFmpegPanelStore } from "../store"; // 更新导入路径
 
@@ -8,19 +9,18 @@ import { useFFmpegPanelStore } from "../store"; // 更新导入路径
 
 const { Text } = Typography;
 
-const FFmpegList: React.FC = () => {
-  const { templates, selectedTemplateId, selectTemplate } =
-    // useFFmpegListStore(); // 使用FFmpegPanel store
-    useFFmpegPanelStore();
+interface FFmpegListProps {
+  templates?: FFmpegTemplate[];
+}
+
+const FFmpegList: React.FC<FFmpegListProps> = ({ templates }) => {
+  const store = useFFmpegPanelStore();
+  const { selectedTemplateId, selectTemplate } = store;
+  const tplList = templates || store.templates;
 
   useEffect(() => {
-    // Load templates when the component mounts
-    // 注意：useFFmpegPanelStore中没有loadTemplates方法，需要调整或手动加载
-    // 暂时不调用loadTemplates，假设App.tsx或其他地方已经加载了模板
-    // loadTemplates(); // 移除loadTemplates调用，因为FFmpegPanel store中没有这个action
-    // 如果FFmpegPanelStore需要加载模板，可以在这里触发，但这取决于您的设计
-    // 例如：getTemplates(); // 假设FFmpegPanelStore有一个getTemplates action
-  }, []); // 依赖项列表清空，避免无限循环
+    // 预留加载逻辑
+  }, []);
 
   const handleSelectTemplate = (templateId: string | null) => {
     selectTemplate(templateId);
@@ -35,9 +35,24 @@ const FFmpegList: React.FC = () => {
 
   return (
     <div className={styles.ffmpegListContainer}>
-      <h2>FFmpeg 模板列表 (单选)</h2>
       <List
-        dataSource={templates}
+        dataSource={tplList}
+        pagination={{
+          pageSize: 5,
+          showSizeChanger: true,
+          pageSizeOptions: ["5", "10", "20", "50"],
+          locale: {
+            items_per_page: "条/页",
+            jump_to: "跳至",
+            jump_to_confirm: "确定",
+            next_page: "下一页",
+            prev_page: "上一页",
+            prev_5: "向前 5 页",
+            next_5: "向后 5 页",
+            prev_3: "向前 3 页",
+            next_3: "向后 3 页",
+          },
+        }}
         renderItem={(template) => (
           <List.Item
             actions={[

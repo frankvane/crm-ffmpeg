@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 1,
+            "activePatchIndex": 4,
             "patches": [
                 {
                     "date": 1748130907122,
@@ -12,6 +12,18 @@
                 {
                     "date": 1748130920236,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import { Alert, Button, Input, List, Modal, Popconfirm, Space } from \"antd\";\r\n+import { Alert, Button, List, Modal, Popconfirm } from \"antd\";\r\n \r\n import { FFmpegTemplate } from \"../types\";\r\n import React from \"react\";\r\n \r\n@@ -7,26 +7,20 @@\n   modalOpen: boolean;\r\n   setModalOpen: (open: boolean) => void;\r\n   templates: FFmpegTemplate[];\r\n   editingTemplateId: string | null;\r\n-  newTplName: string;\r\n-  setNewTplName: (name: string) => void;\r\n-  handleCreateTemplate: () => void;\r\n   handleUpdateTemplate: () => void;\r\n   handleOpenRenameModal: (tpl: { id: string; name: string }) => void;\r\n   deleteTemplate: (id: string) => void;\r\n   applyTemplate: (id: string) => void;\r\n-  isSaveDisabled: boolean; // 新增 prop，用于控制新建/更新按钮的disabled状态\r\n+  isSaveDisabled: boolean;\r\n }\r\n \r\n const TemplateManagementModal: React.FC<TemplateManagementModalProps> = ({\r\n   modalOpen,\r\n   setModalOpen,\r\n   templates,\r\n   editingTemplateId,\r\n-  newTplName,\r\n-  setNewTplName,\r\n-  handleCreateTemplate,\r\n   handleUpdateTemplate,\r\n   handleOpenRenameModal,\r\n   deleteTemplate,\r\n   applyTemplate,\r\n"
+                },
+                {
+                    "date": 1748263883038,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -11,8 +11,9 @@\n   handleUpdateTemplate: () => void;\r\n   handleOpenRenameModal: (tpl: { id: string; name: string }) => void;\r\n   deleteTemplate: (id: string) => void;\r\n   applyTemplate: (id: string) => void;\r\n+  selectTemplate: (id: string) => void;\r\n   isSaveDisabled: boolean;\r\n }\r\n \r\n const TemplateManagementModal: React.FC<TemplateManagementModalProps> = ({\r\n@@ -23,8 +24,9 @@\n   handleUpdateTemplate,\r\n   handleOpenRenameModal,\r\n   deleteTemplate,\r\n   applyTemplate,\r\n+  selectTemplate,\r\n   isSaveDisabled,\r\n }) => {\r\n   return (\r\n     <Modal\r\n@@ -79,10 +81,10 @@\n                 size=\"small\"\r\n                 type=\"link\"\r\n                 onClick={() => {\r\n                   applyTemplate(tpl.id);\r\n+                  selectTemplate(tpl.id); // 同步设置为选中模板\r\n                   setModalOpen(false); // Close modal after applying\r\n-                  // setEditingTemplateId(null); // 这个状态的管理现在由 useTemplateManagement 负责\r\n                 }}\r\n               >\r\n                 应用\r\n               </Button>,\r\n"
+                },
+                {
+                    "date": 1748264224584,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -12,8 +12,10 @@\n   handleOpenRenameModal: (tpl: { id: string; name: string }) => void;\r\n   deleteTemplate: (id: string) => void;\r\n   applyTemplate: (id: string) => void;\r\n   selectTemplate: (id: string) => void;\r\n+  setEditingTemplateId: (id: string | null) => void;\r\n+  setMode: (mode: \"new\" | \"edit\") => void;\r\n   isSaveDisabled: boolean;\r\n }\r\n \r\n const TemplateManagementModal: React.FC<TemplateManagementModalProps> = ({\r\n@@ -25,8 +27,10 @@\n   handleOpenRenameModal,\r\n   deleteTemplate,\r\n   applyTemplate,\r\n   selectTemplate,\r\n+  setEditingTemplateId,\r\n+  setMode,\r\n   isSaveDisabled,\r\n }) => {\r\n   return (\r\n     <Modal\r\n@@ -93,11 +97,13 @@\n                 key=\"edit\"\r\n                 size=\"small\"\r\n                 type=\"link\"\r\n                 onClick={() => {\r\n-                  applyTemplate(tpl.id); // 应用模板内容到主面板\r\n-                  // setEditingTemplateId(tpl.id); // 这个状态的管理现在由 useTemplateManagement 负责\r\n-                  setModalOpen(false); // 关闭模态框\r\n+                  applyTemplate(tpl.id);\r\n+                  selectTemplate(tpl.id);\r\n+                  setEditingTemplateId(tpl.id); // 进入编辑模式\r\n+                  setMode(\"edit\");\r\n+                  setModalOpen(false);\r\n                 }}\r\n               >\r\n                 编辑\r\n               </Button>,\r\n"
+                },
+                {
+                    "date": 1748264592656,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -78,21 +78,8 @@\n         dataSource={templates}\r\n         renderItem={(tpl) => (\r\n           <List.Item\r\n             actions={[\r\n-              // 应用模板按钮\r\n-              <Button\r\n-                key=\"apply\"\r\n-                size=\"small\"\r\n-                type=\"link\"\r\n-                onClick={() => {\r\n-                  applyTemplate(tpl.id);\r\n-                  selectTemplate(tpl.id); // 同步设置为选中模板\r\n-                  setModalOpen(false); // Close modal after applying\r\n-                }}\r\n-              >\r\n-                应用\r\n-              </Button>,\r\n               // 编辑按钮\r\n               <Button\r\n                 key=\"edit\"\r\n                 size=\"small\"\r\n"
                 }
             ],
             "date": 1748130907122,
